@@ -1,0 +1,4606 @@
+{
+  "source": "https://app.ambiguous.ai/api/openapi.json",
+  "retrievedAt": "2026-09-12",
+  "paths": {
+    "/api/documents": {
+      "get": {
+        "operationId": "list_documents",
+        "tags": [
+          "Documents"
+        ],
+        "description": "List the current user's documents. Optionally filter by type. Returns an array of documents with id, type, title, owner, and timestamps.",
+        "x-tool": {
+          "expose": [
+            "assistant",
+            "mcp"
+          ]
+        },
+        "x-cli": {
+          "command": "docs list",
+          "output": {
+            "columns": [
+              "id",
+              "type",
+              "title",
+              "updated_at"
+            ]
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "doc",
+                "sheet",
+                "slide"
+              ],
+              "description": "Filter by document type."
+            },
+            "required": false,
+            "description": "Filter by document type.",
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ],
+              "description": "Pass 'true' to return only starred documents."
+            },
+            "required": false,
+            "description": "Pass 'true' to return only starred documents.",
+            "name": "starred",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Alias for `limit`."
+            },
+            "required": false,
+            "description": "Alias for `limit`.",
+            "name": "max_results",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "required": false,
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Opaque cursor from a prior `next_cursor`."
+            },
+            "required": false,
+            "description": "Opaque cursor from a prior `next_cursor`.",
+            "name": "cursor",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "notify",
+            "in": "query"
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "required": false,
+            "description": "REST API major version 1 is selected with the optional API-Version: 1 request header (the default). Responses echo API-Version. Unsupported versions return 400. Additive fields and endpoints may be introduced within a major version; incompatible changes require a new major version. Deprecated operations are marked deprecated in OpenAPI; a scheduled removal must advertise Deprecation and Sunset headers before removal.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1"
+              ],
+              "default": "1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/DocumentListResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "entities": {
+                          "$ref": "#/components/schemas/EntityReferenceMap"
+                        },
+                        "entities_truncated": {
+                          "type": "boolean",
+                          "enum": [
+                            true
+                          ],
+                          "description": "Present only when the reference walk hit its cap; the resolved subset is still returned."
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_document",
+        "tags": [
+          "Documents"
+        ],
+        "description": "Create a new document, spreadsheet, or presentation in the workspace. For docs, content should be Markdown. For sheets, content should be JSON. For slides, content should be Marp-flavored Markdown.",
+        "x-tool": {
+          "expose": [
+            "all"
+          ]
+        },
+        "x-cli": {
+          "command": "docs create"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDocumentInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/DocumentEnvelope"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "entities": {
+                          "$ref": "#/components/schemas/EntityReferenceMap"
+                        },
+                        "entities_truncated": {
+                          "type": "boolean",
+                          "enum": [
+                            true
+                          ],
+                          "description": "Present only when the reference walk hit its cap; the resolved subset is still returned."
+                        }
+                      },
+                      "additionalProperties": {}
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "API-Version",
+            "in": "header",
+            "required": false,
+            "description": "REST API major version 1 is selected with the optional API-Version: 1 request header (the default). Responses echo API-Version. Unsupported versions return 400. Additive fields and endpoints may be introduced within a major version; incompatible changes require a new major version. Deprecated operations are marked deprecated in OpenAPI; a scheduled removal must advertise Deprecation and Sunset headers before removal.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1"
+              ],
+              "default": "1"
+            }
+          }
+        ]
+      }
+    },
+    "/api/documents/{id}": {
+      "get": {
+        "operationId": "get_document",
+        "tags": [
+          "Documents"
+        ],
+        "description": "Get a single document by ID, including its full content and comments. If the user is currently viewing a document, use the document ID from the page context.",
+        "x-tool": {
+          "expose": [
+            "assistant",
+            "mcp"
+          ]
+        },
+        "x-cli": {
+          "command": "docs get"
+        },
+        "parameters": [
+          {
+            "schema": {
+              "$ref": "#/components/schemas/DocumentId"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "required": false,
+            "description": "REST API major version 1 is selected with the optional API-Version: 1 request header (the default). Responses echo API-Version. Unsupported versions return 400. Additive fields and endpoints may be introduced within a major version; incompatible changes require a new major version. Deprecated operations are marked deprecated in OpenAPI; a scheduled removal must advertise Deprecation and Sunset headers before removal.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1"
+              ],
+              "default": "1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/DocumentEnvelope"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "entities": {
+                          "$ref": "#/components/schemas/EntityReferenceMap"
+                        },
+                        "entities_truncated": {
+                          "type": "boolean",
+                          "enum": [
+                            true
+                          ],
+                          "description": "Present only when the reference walk hit its cap; the resolved subset is still returned."
+                        }
+                      },
+                      "additionalProperties": {}
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "update_document",
+        "tags": [
+          "Documents"
+        ],
+        "description": "Edit an existing document inline. Read the document first (get_document), modify the content, then pass the full updated text â content replaces the entire body. Do NOT create a new document to edit; version history preserves prior states. Accepts Markdown or ProseMirror JSON (HTML tolerated but lossy â drops listed in `import_warnings`). Provide only the fields you want to change.",
+        "x-tool": {
+          "expose": [
+            "all"
+          ]
+        },
+        "x-cli": {
+          "command": "docs update"
+        },
+        "parameters": [
+          {
+            "schema": {
+              "$ref": "#/components/schemas/DocumentId"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "required": false,
+            "description": "REST API major version 1 is selected with the optional API-Version: 1 request header (the default). Responses echo API-Version. Unsupported versions return 400. Additive fields and endpoints may be introduced within a major version; incompatible changes require a new major version. Deprecated operations are marked deprecated in OpenAPI; a scheduled removal must advertise Deprecation and Sunset headers before removal.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1"
+              ],
+              "default": "1"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDocumentInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/DocumentEnvelope"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "entities": {
+                          "$ref": "#/components/schemas/EntityReferenceMap"
+                        },
+                        "entities_truncated": {
+                          "type": "boolean",
+                          "enum": [
+                            true
+                          ],
+                          "description": "Present only when the reference walk hit its cap; the resolved subset is still returned."
+                        }
+                      },
+                      "additionalProperties": {}
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "documents_delete",
+        "tags": [
+          "Documents"
+        ],
+        "description": "Soft-delete a document (move to trash). Owner only.",
+        "x-tool": {
+          "expose": [
+            "assistant",
+            "mcp"
+          ]
+        },
+        "x-cli": {
+          "command": "docs delete",
+          "confirm": true
+        },
+        "parameters": [
+          {
+            "schema": {
+              "$ref": "#/components/schemas/DocumentId"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "required": false,
+            "description": "REST API major version 1 is selected with the optional API-Version: 1 request header (the default). Responses echo API-Version. Unsupported versions return 400. Additive fields and endpoints may be introduced within a major version; incompatible changes require a new major version. Deprecated operations are marked deprecated in OpenAPI; a scheduled removal must advertise Deprecation and Sunset headers before removal.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1"
+              ],
+              "default": "1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/DeletedResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "entities": {
+                          "$ref": "#/components/schemas/EntityReferenceMap"
+                        },
+                        "entities_truncated": {
+                          "type": "boolean",
+                          "enum": [
+                            true
+                          ],
+                          "description": "Present only when the reference walk hit its cap; the resolved subset is still returned."
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tasks": {
+      "get": {
+        "operationId": "list_tasks",
+        "tags": [
+          "Tasks"
+        ],
+        "description": "List tasks in the workspace. Pass assignee_id to filter by assignee (use the caller's user ID for 'my tasks'). Supports filtering by status, priority, project, and free-text query.",
+        "x-tool": {
+          "expose": [
+            "mcp",
+            "assistant"
+          ]
+        },
+        "x-cli": {
+          "command": "tasks list",
+          "aliases": [
+            "tasks ls"
+          ],
+          "output": {
+            "format": "table",
+            "columns": [
+              "id",
+              "task_key",
+              "title",
+              "status",
+              "priority",
+              "assignee.display_name",
+              "due_date"
+            ]
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "description": "Filter to tasks assigned to this user. `unassigned` to filter to unassigned."
+            },
+            "required": false,
+            "description": "Filter to tasks assigned to this user. `unassigned` to filter to unassigned.",
+            "name": "assignee_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Filter by creator user ID."
+            },
+            "required": false,
+            "description": "Filter by creator user ID.",
+            "name": "creator_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Filter by system status. Comma-separated for multi-select."
+            },
+            "required": false,
+            "description": "Filter by system status. Comma-separated for multi-select.",
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Filter by custom status ID."
+            },
+            "required": false,
+            "description": "Filter by custom status ID.",
+            "name": "task_status_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Comma-separated custom status IDs to exclude."
+            },
+            "required": false,
+            "description": "Comma-separated custom status IDs to exclude.",
+            "name": "exclude_task_status_ids",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "priority",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "project_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Filter by parent task ID. Special value `null` (string) returns top-level tasks only."
+            },
+            "required": false,
+            "description": "Filter by parent task ID. Special value `null` (string) returns top-level tasks only.",
+            "name": "parent_task_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "YYYY-MM-DD lower bound (inclusive)."
+            },
+            "required": false,
+            "description": "YYYY-MM-DD lower bound (inclusive).",
+            "name": "due_date_start",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "YYYY-MM-DD upper bound (inclusive)."
+            },
+            "required": false,
+            "description": "YYYY-MM-DD upper bound (inclusive).",
+            "name": "due_date_end",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ],
+              "description": "Pass 'true' to filter to tasks with a due date set."
+            },
+            "required": false,
+            "description": "Pass 'true' to filter to tasks with a due date set.",
+            "name": "has_due_date",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "start_date_from",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "start_date_to",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Free-text search across title + description."
+            },
+            "required": false,
+            "description": "Free-text search across title + description.",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "ISO 8601 lower bound on `completed_at`."
+            },
+            "required": false,
+            "description": "ISO 8601 lower bound on `completed_at`.",
+            "name": "completed_min",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "ISO 8601 upper bound on `completed_at`."
+            },
+            "required": false,
+            "description": "ISO 8601 upper bound on `completed_at`.",
+            "name": "completed_max",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "ISO 8601 lower bound on `updated_at`."
+            },
+            "required": false,
+            "description": "ISO 8601 lower bound on `updated_at`.",
+            "name": "updated_min",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Filter by cycle ID. `none` returns tasks with no cycle."
+            },
+            "required": false,
+            "description": "Filter by cycle ID. `none` returns tasks with no cycle.",
+            "name": "cycle_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Filter by a single label ID (must be a UUID)."
+            },
+            "required": false,
+            "description": "Filter by a single label ID (must be a UUID).",
+            "name": "label_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Comma-separated label IDs (AND match)."
+            },
+            "required": false,
+            "description": "Comma-separated label IDs (AND match).",
+            "name": "label_ids",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Comma-separated label IDs (OR match)."
+            },
+            "required": false,
+            "description": "Comma-separated label IDs (OR match).",
+            "name": "any_label_ids",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Filter to tasks linked to this CRM contact."
+            },
+            "required": false,
+            "description": "Filter to tasks linked to this CRM contact.",
+            "name": "contact_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Filter to tasks linked to this CRM deal."
+            },
+            "required": false,
+            "description": "Filter to tasks linked to this CRM deal.",
+            "name": "deal_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Pass 'me' to filter to tasks the caller is subscribed to."
+            },
+            "required": false,
+            "description": "Pass 'me' to filter to tasks the caller is subscribed to.",
+            "name": "subscribed",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Pass 'true' to filter to tasks assigned to AI coworkers managed by the caller."
+            },
+            "required": false,
+            "description": "Pass 'true' to filter to tasks assigned to AI coworkers managed by the caller.",
+            "name": "managed_coworkers",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ],
+              "description": "Pass 'true' to include archived tasks (default: hidden)."
+            },
+            "required": false,
+            "description": "Pass 'true' to include archived tasks (default: hidden).",
+            "name": "show_archived",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ],
+              "description": "Pass 'true' to filter to tasks with no project_id."
+            },
+            "required": false,
+            "description": "Pass 'true' to filter to tasks with no project_id.",
+            "name": "untriaged",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ],
+              "description": "Pass 'true' to filter out tasks blocked via task_relations."
+            },
+            "required": false,
+            "description": "Pass 'true' to filter out tasks blocked via task_relations.",
+            "name": "hide_blocked",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "$ref": "#/components/schemas/TaskListSort"
+            },
+            "required": false,
+            "description": "Sort order for `GET /api/tasks`. `updated_at` (recently-touched first) is the default; `sort_order` for board / drag-reorder; `created_at` for chronology; `due_date` for deadline proximity; `priority` for urgency ranking.",
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Opaque cursor from a prior `next_cursor`."
+            },
+            "required": false,
+            "description": "Opaque cursor from a prior `next_cursor`.",
+            "name": "cursor",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Alias for `limit`."
+            },
+            "required": false,
+            "description": "Alias for `limit`.",
+            "name": "max_results",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0,
+              "description": "Offset-based pagination fallback."
+            },
+            "required": false,
+            "description": "Offset-based pagination fallback.",
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "notify",
+            "in": "query"
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "required": false,
+            "description": "REST API major version 1 is selected with the optional API-Version: 1 request header (the default). Responses echo API-Version. Unsupported versions return 400. Additive fields and endpoints may be introduced within a major version; incompatible changes require a new major version. Deprecated operations are marked deprecated in OpenAPI; a scheduled removal must advertise Deprecation and Sunset headers before removal.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1"
+              ],
+              "default": "1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/TaskListResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "entities": {
+                          "$ref": "#/components/schemas/EntityReferenceMap"
+                        },
+                        "entities_truncated": {
+                          "type": "boolean",
+                          "enum": [
+                            true
+                          ],
+                          "description": "Present only when the reference walk hit its cap; the resolved subset is still returned."
+                        }
+                      }
+                    }
+                  ],
+                  "description": "Response body for `GET /api/tasks`."
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_task",
+        "tags": [
+          "Tasks"
+        ],
+        "description": "Create a new task. Auto-subscribes the creator and (if assigned) the assignee. Auto-sets SLA due date when priority is set without an explicit due_date. Auto-logs a CRM activity if linked to a contact.",
+        "x-tool": {
+          "expose": [
+            "all",
+            "automations"
+          ]
+        },
+        "x-cli": {
+          "command": "tasks create",
+          "aliases": [
+            "task add"
+          ],
+          "output": {
+            "successMessage": "Task created: {task.id} â {task.title}"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskCreateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/TaskCreateResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "entities": {
+                          "$ref": "#/components/schemas/EntityReferenceMap"
+                        },
+                        "entities_truncated": {
+                          "type": "boolean",
+                          "enum": [
+                            true
+                          ],
+                          "description": "Present only when the reference walk hit its cap; the resolved subset is still returned."
+                        }
+                      }
+                    }
+                  ],
+                  "description": "Response body for `POST /api/tasks`. Wrapped in `{ task }` for legacy compatibility."
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "API-Version",
+            "in": "header",
+            "required": false,
+            "description": "REST API major version 1 is selected with the optional API-Version: 1 request header (the default). Responses echo API-Version. Unsupported versions return 400. Additive fields and endpoints may be introduced within a major version; incompatible changes require a new major version. Deprecated operations are marked deprecated in OpenAPI; a scheduled removal must advertise Deprecation and Sunset headers before removal.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1"
+              ],
+              "default": "1"
+            }
+          }
+        ]
+      }
+    },
+    "/api/tasks/{id}": {
+      "get": {
+        "operationId": "get_task",
+        "tags": [
+          "Tasks"
+        ],
+        "description": "Get a single task by ID, including full details: title, description, status, priority, assignee, due date, labels, and subtask count.",
+        "x-tool": {
+          "expose": [
+            "mcp",
+            "assistant",
+            "automations"
+          ]
+        },
+        "x-cli": {
+          "command": "tasks get"
+        },
+        "parameters": [
+          {
+            "schema": {
+              "$ref": "#/components/schemas/TaskId"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "required": false,
+            "description": "REST API major version 1 is selected with the optional API-Version: 1 request header (the default). Responses echo API-Version. Unsupported versions return 400. Additive fields and endpoints may be introduced within a major version; incompatible changes require a new major version. Deprecated operations are marked deprecated in OpenAPI; a scheduled removal must advertise Deprecation and Sunset headers before removal.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1"
+              ],
+              "default": "1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/TaskWrappedResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "entities": {
+                          "$ref": "#/components/schemas/EntityReferenceMap"
+                        },
+                        "entities_truncated": {
+                          "type": "boolean",
+                          "enum": [
+                            true
+                          ],
+                          "description": "Present only when the reference walk hit its cap; the resolved subset is still returned."
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "update_task",
+        "tags": [
+          "Tasks"
+        ],
+        "description": "Update a task. Status changes to 'done' auto-spawn the next recurrence (when set), trigger CRM activity logging, and emit task.completed events.",
+        "x-tool": {
+          "expose": [
+            "all",
+            "automations"
+          ]
+        },
+        "x-cli": {
+          "command": "tasks update"
+        },
+        "parameters": [
+          {
+            "schema": {
+              "$ref": "#/components/schemas/TaskId"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "required": false,
+            "description": "REST API major version 1 is selected with the optional API-Version: 1 request header (the default). Responses echo API-Version. Unsupported versions return 400. Additive fields and endpoints may be introduced within a major version; incompatible changes require a new major version. Deprecated operations are marked deprecated in OpenAPI; a scheduled removal must advertise Deprecation and Sunset headers before removal.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1"
+              ],
+              "default": "1"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskUpdateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/TaskCreateResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "entities": {
+                          "$ref": "#/components/schemas/EntityReferenceMap"
+                        },
+                        "entities_truncated": {
+                          "type": "boolean",
+                          "enum": [
+                            true
+                          ],
+                          "description": "Present only when the reference walk hit its cap; the resolved subset is still returned."
+                        }
+                      }
+                    }
+                  ],
+                  "description": "Response body for `POST /api/tasks`. Wrapped in `{ task }` for legacy compatibility."
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "tasks_delete",
+        "tags": [
+          "Tasks"
+        ],
+        "description": "Soft-delete a task. Only the creator can delete.",
+        "x-tool": {
+          "expose": [
+            "mcp"
+          ]
+        },
+        "x-cli": {
+          "command": "tasks delete",
+          "confirm": true
+        },
+        "parameters": [
+          {
+            "schema": {
+              "$ref": "#/components/schemas/TaskId"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "required": false,
+            "description": "REST API major version 1 is selected with the optional API-Version: 1 request header (the default). Responses echo API-Version. Unsupported versions return 400. Additive fields and endpoints may be introduced within a major version; incompatible changes require a new major version. Deprecated operations are marked deprecated in OpenAPI; a scheduled removal must advertise Deprecation and Sunset headers before removal.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1"
+              ],
+              "default": "1"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No content",
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/crm/contacts": {
+      "get": {
+        "operationId": "list_contacts",
+        "tags": [
+          "CRM"
+        ],
+        "description": "List CRM contacts. Supports filtering by type, lifecycle stage, owner, and text search. Returns contacts with id, name, email, phone, type, lifecycle_stage, company, and timestamps. Use this when the user asks to see their contacts, find a person, or list companies. Also use this with the 'q' parameter to search for existing contacts BEFORE creating new ones to prevent duplicates.",
+        "x-tool": {
+          "expose": [
+            "assistant",
+            "mcp"
+          ]
+        },
+        "x-cli": {
+          "command": "crm contacts list",
+          "output": {
+            "columns": [
+              "id",
+              "name",
+              "email",
+              "type",
+              "lifecycle_stage",
+              "lead_score"
+            ]
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "person",
+                "company"
+              ],
+              "description": "Filter by contact type (`person` or `company`)."
+            },
+            "required": false,
+            "description": "Filter by contact type (`person` or `company`).",
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "subscriber",
+                "lead",
+                "mql",
+                "sql",
+                "opportunity",
+                "customer",
+                "evangelist"
+              ],
+              "description": "Filter by funnel stage."
+            },
+            "required": false,
+            "description": "Filter by funnel stage.",
+            "name": "lifecycle_stage",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Filter to contacts owned by this user."
+            },
+            "required": false,
+            "description": "Filter to contacts owned by this user.",
+            "name": "owner_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Filter to contacts belonging to this company."
+            },
+            "required": false,
+            "description": "Filter to contacts belonging to this company.",
+            "name": "company_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Filter to contacts that are members of this contact group."
+            },
+            "required": false,
+            "description": "Filter to contacts that are members of this contact group.",
+            "name": "group_id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Free-text search across name/email/phone."
+            },
+            "required": false,
+            "description": "Free-text search across name/email/phone.",
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Opaque cursor from a prior `next_cursor` for page-after-page walking."
+            },
+            "required": false,
+            "description": "Opaque cursor from a prior `next_cursor` for page-after-page walking.",
+            "name": "cursor",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 500,
+              "description": "Max rows per page (1-500, default 50). The People view requests 500 for the unified company-grouped UI."
+            },
+            "required": false,
+            "description": "Max rows per page (1-500, default 50). The People view requests 500 for the unified company-grouped UI.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0,
+              "description": "Offset-based pagination; use `cursor` for large result sets."
+            },
+            "required": false,
+            "description": "Offset-based pagination; use `cursor` for large result sets.",
+            "name": "offset",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "fields",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "notify",
+            "in": "query"
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "required": false,
+            "description": "REST API major version 1 is selected with the optional API-Version: 1 request header (the default). Responses echo API-Version. Unsupported versions return 400. Additive fields and endpoints may be introduced within a major version; incompatible changes require a new major version. Deprecated operations are marked deprecated in OpenAPI; a scheduled removal must advertise Deprecation and Sunset headers before removal.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1"
+              ],
+              "default": "1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ContactsListResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "entities": {
+                          "$ref": "#/components/schemas/EntityReferenceMap"
+                        },
+                        "entities_truncated": {
+                          "type": "boolean",
+                          "enum": [
+                            true
+                          ],
+                          "description": "Present only when the reference walk hit its cap; the resolved subset is still returned."
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_contact",
+        "tags": [
+          "CRM"
+        ],
+        "description": "Create a new CRM contact (person or company). Persons can be linked to a company via company_id. IMPORTANT: Before creating a contact, ALWAYS call list_contacts with a search query (q) to check if a contact with the same name or email already exists. If a matching contact is found, use update_contact instead of creating a duplicate. Only create a new contact if no match is found. Use this when the user asks to add a contact, log a lead, or create a company record.",
+        "x-tool": {
+          "expose": [
+            "all"
+          ]
+        },
+        "x-cli": {
+          "command": "crm contacts create",
+          "output": {
+            "successMessage": "Contact created: {contact.id}"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactCreateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ContactResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "entities": {
+                          "$ref": "#/components/schemas/EntityReferenceMap"
+                        },
+                        "entities_truncated": {
+                          "type": "boolean",
+                          "enum": [
+                            true
+                          ],
+                          "description": "Present only when the reference walk hit its cap; the resolved subset is still returned."
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DuplicateContactError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "API-Version",
+            "in": "header",
+            "required": false,
+            "description": "REST API major version 1 is selected with the optional API-Version: 1 request header (the default). Responses echo API-Version. Unsupported versions return 400. Additive fields and endpoints may be introduced within a major version; incompatible changes require a new major version. Deprecated operations are marked deprecated in OpenAPI; a scheduled removal must advertise Deprecation and Sunset headers before removal.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1"
+              ],
+              "default": "1"
+            }
+          }
+        ]
+      }
+    },
+    "/api/crm/contacts/{id}": {
+      "get": {
+        "operationId": "get_contact",
+        "tags": [
+          "CRM"
+        ],
+        "description": "Get a single CRM contact by ID, including full details: name, email, phone, title, company, lifecycle stage, custom properties, and timestamps. If the user is currently viewing a contact, use the contact ID from the page context.",
+        "x-tool": {
+          "expose": [
+            "assistant",
+            "mcp"
+          ]
+        },
+        "x-cli": {
+          "command": "crm contacts get"
+        },
+        "parameters": [
+          {
+            "schema": {
+              "$ref": "#/components/schemas/ContactId"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "required": false,
+            "description": "REST API major version 1 is selected with the optional API-Version: 1 request header (the default). Responses echo API-Version. Unsupported versions return 400. Additive fields and endpoints may be introduced within a major version; incompatible changes require a new major version. Deprecated operations are marked deprecated in OpenAPI; a scheduled removal must advertise Deprecation and Sunset headers before removal.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1"
+              ],
+              "default": "1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ContactResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "entities": {
+                          "$ref": "#/components/schemas/EntityReferenceMap"
+                        },
+                        "entities_truncated": {
+                          "type": "boolean",
+                          "enum": [
+                            true
+                          ],
+                          "description": "Present only when the reference walk hit its cap; the resolved subset is still returned."
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "update_contact",
+        "tags": [
+          "CRM"
+        ],
+        "description": "Update an existing CRM contact's fields. Provide only the fields you want to change. If the user is currently viewing a contact, use the contact ID from the page context.",
+        "x-tool": {
+          "expose": [
+            "all",
+            "automations"
+          ]
+        },
+        "x-cli": {
+          "command": "crm contacts update"
+        },
+        "parameters": [
+          {
+            "schema": {
+              "$ref": "#/components/schemas/ContactId"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "required": false,
+            "description": "REST API major version 1 is selected with the optional API-Version: 1 request header (the default). Responses echo API-Version. Unsupported versions return 400. Additive fields and endpoints may be introduced within a major version; incompatible changes require a new major version. Deprecated operations are marked deprecated in OpenAPI; a scheduled removal must advertise Deprecation and Sunset headers before removal.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1"
+              ],
+              "default": "1"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactUpdateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ContactResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "entities": {
+                          "$ref": "#/components/schemas/EntityReferenceMap"
+                        },
+                        "entities_truncated": {
+                          "type": "boolean",
+                          "enum": [
+                            true
+                          ],
+                          "description": "Present only when the reference walk hit its cap; the resolved subset is still returned."
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete_contact",
+        "tags": [
+          "CRM"
+        ],
+        "description": "Delete a CRM contact (owner-scoped). Permanently removes the contact record. Use with caution â prefer updating lifecycle_stage to 'evangelist' or archiving via merge instead.",
+        "x-tool": {
+          "expose": [
+            "all"
+          ]
+        },
+        "x-cli": {
+          "command": "crm contacts delete",
+          "confirm": true
+        },
+        "parameters": [
+          {
+            "schema": {
+              "$ref": "#/components/schemas/ContactId"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "name": "API-Version",
+            "in": "header",
+            "required": false,
+            "description": "REST API major version 1 is selected with the optional API-Version: 1 request header (the default). Responses echo API-Version. Unsupported versions return 400. Additive fields and endpoints may be introduced within a major version; incompatible changes require a new major version. Deprecated operations are marked deprecated in OpenAPI; a scheduled removal must advertise Deprecation and Sunset headers before removal.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1"
+              ],
+              "default": "1"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No content",
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "description": "Selected REST major version",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "1"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DocumentListResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Document"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Rows in `data`. Not a count of every matching document â the list path runs no count query."
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "next_cursor": {
+            "type": "string",
+            "description": "Opaque cursor for the next page. Present only when `has_more` is true."
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "has_more"
+        ]
+      },
+      "Document": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "description": "`doc`, `sheet`, or `slide`."
+          },
+          "title": {
+            "type": "string"
+          },
+          "owner_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "owner_username": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Owner's username (slug-form). Populated for both human and agent owners; null only when owner row has no username."
+          },
+          "content": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Authoring format. Docs use ProseMirror JSON; sheets/slides use JSON canvas. May be null on freshly-created entities."
+          },
+          "visibility": {
+            "type": "string"
+          },
+          "link_expires_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "has_password": {
+            "type": "boolean"
+          },
+          "link_permission": {
+            "type": "string",
+            "enum": [
+              "viewer",
+              "commenter",
+              "editor"
+            ]
+          },
+          "can_edit": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "trashed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "pinned_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "starred_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "parent_folder_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "page_style": {
+            "$ref": "#/components/schemas/PageStyle"
+          },
+          "owner": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "display_name": {
+                "type": "string"
+              },
+              "primary_email": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "workspace_email": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Computed in-workspace address (`<username>@<default-workspace-domain>`). A verified custom domain is used only after an Admin selects it as the workspace default."
+              },
+              "username": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "avatar_url": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Profile avatar URL. Present on comment author refs; absent on document envelopes."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "human",
+                  "agent"
+                ],
+                "description": "Owner principal type. Always present on document envelopes; absent on comment author refs."
+              },
+              "support": {
+                "type": "boolean",
+                "description": "Server-derived: true when the author is an active Ambiguous Support session (a time-boxed membership). Never client-writable."
+              }
+            },
+            "required": [
+              "id",
+              "display_name",
+              "primary_email",
+              "username"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "title",
+          "owner_id",
+          "owner_username",
+          "content",
+          "visibility",
+          "link_expires_at",
+          "has_password",
+          "link_permission",
+          "created_at",
+          "updated_at",
+          "pinned_at",
+          "starred_at",
+          "labels",
+          "page_style",
+          "owner"
+        ]
+      },
+      "PageStyle": {
+        "type": "object",
+        "properties": {
+          "margins": {
+            "type": "object",
+            "properties": {
+              "top": {
+                "type": "number"
+              },
+              "bottom": {
+                "type": "number"
+              },
+              "left": {
+                "type": "number"
+              },
+              "right": {
+                "type": "number"
+              }
+            }
+          },
+          "pageSize": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "width": {
+                    "type": "number"
+                  },
+                  "height": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "width",
+                  "height"
+                ]
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "letter",
+                  "A4",
+                  "legal"
+                ]
+              }
+            ]
+          },
+          "orientation": {
+            "type": "string",
+            "enum": [
+              "portrait",
+              "landscape"
+            ]
+          },
+          "pageless": {
+            "description": "Pageless (continuous) layout toggle."
+          },
+          "backgroundColor": {
+            "description": "Canvas background: `default`/`white`/`dark` preset or 6-digit hex."
+          }
+        }
+      },
+      "EntityReferenceMap": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/EntityReferenceResolution"
+        },
+        "description": "Entities referenced by `@{type:id}` tokens in this response, resolved under the requesting principal."
+      },
+      "EntityReferenceResolution": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "resolution": {
+                "type": "string",
+                "enum": [
+                  "ok"
+                ]
+              },
+              "entity": {
+                "description": "Per-module preview row for the referenced entity."
+              }
+            },
+            "required": [
+              "resolution"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "resolution": {
+                "type": "string",
+                "enum": [
+                  "unavailable"
+                ]
+              }
+            },
+            "required": [
+              "resolution"
+            ]
+          }
+        ]
+      },
+      "ApiError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "request_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "CreateDocumentInput": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "doc",
+              "sheet",
+              "slide"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string",
+            "description": "Document body. For type=doc, accepts Markdown (recommended) or a ProseMirror JSON string. HTML is tolerated best-effort: a tag the editor schema maps becomes its node or mark, so `<b>x</b>` stores `x` in bold. A tag it does not map is kept as literal text, attributes and closing tag verbatim, so `<display-slug>` survives a round trip. Styling and decorative wrappers are still dropped and are listed in `import_warnings` on the response. For type=sheet/slide, see the respective module's authoring format."
+          },
+          "visibility": {
+            "type": "string"
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "page_style": {
+            "type": "object",
+            "properties": {
+              "margins": {
+                "type": "object",
+                "properties": {
+                  "top": {
+                    "type": "number"
+                  },
+                  "bottom": {
+                    "type": "number"
+                  },
+                  "left": {
+                    "type": "number"
+                  },
+                  "right": {
+                    "type": "number"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "pageSize": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "width": {
+                        "type": "number"
+                      },
+                      "height": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "width",
+                      "height"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "letter",
+                      "A4",
+                      "legal"
+                    ]
+                  }
+                ]
+              },
+              "orientation": {
+                "type": "string",
+                "enum": [
+                  "portrait",
+                  "landscape"
+                ]
+              },
+              "pageless": {
+                "description": "Pageless (continuous) layout toggle."
+              },
+              "backgroundColor": {
+                "description": "Canvas background: `default`/`white`/`dark` preset or 6-digit hex."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "additionalProperties": false
+      },
+      "DocumentEnvelope": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "description": "`doc`, `sheet`, or `slide`."
+          },
+          "title": {
+            "type": "string"
+          },
+          "owner_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "owner_username": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Owner's username (slug-form). Populated for both human and agent owners; null only when owner row has no username."
+          },
+          "content": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Authoring format. Docs use ProseMirror JSON; sheets/slides use JSON canvas. May be null on freshly-created entities."
+          },
+          "visibility": {
+            "type": "string"
+          },
+          "link_expires_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "has_password": {
+            "type": "boolean"
+          },
+          "link_permission": {
+            "type": "string",
+            "enum": [
+              "viewer",
+              "commenter",
+              "editor"
+            ]
+          },
+          "can_edit": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "trashed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "pinned_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "starred_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "parent_folder_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "page_style": {
+            "$ref": "#/components/schemas/PageStyle"
+          },
+          "owner": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "display_name": {
+                "type": "string"
+              },
+              "primary_email": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "workspace_email": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Computed in-workspace address (`<username>@<default-workspace-domain>`). A verified custom domain is used only after an Admin selects it as the workspace default."
+              },
+              "username": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "avatar_url": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Profile avatar URL. Present on comment author refs; absent on document envelopes."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "human",
+                  "agent"
+                ],
+                "description": "Owner principal type. Always present on document envelopes; absent on comment author refs."
+              },
+              "support": {
+                "type": "boolean",
+                "description": "Server-derived: true when the author is an active Ambiguous Support session (a time-boxed membership). Never client-writable."
+              }
+            },
+            "required": [
+              "id",
+              "display_name",
+              "primary_email",
+              "username"
+            ]
+          },
+          "import_warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Content the conversion could not represent, one string per drop. A tag with no schema mapping is kept as literal text and is not a drop; this reports styling, decorative wrappers and head-only elements. Present on every `type: doc` create and update, empty when nothing was dropped. Absent for sheets and slides, and for an editor-session save, which stores no converted body."
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "title",
+          "owner_id",
+          "owner_username",
+          "content",
+          "visibility",
+          "link_expires_at",
+          "has_password",
+          "link_permission",
+          "created_at",
+          "updated_at",
+          "pinned_at",
+          "starred_at",
+          "labels",
+          "page_style",
+          "owner"
+        ],
+        "additionalProperties": {}
+      },
+      "DocumentId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "UpdateDocumentInput": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string",
+            "description": "Replacement document body. For type=doc, accepts Markdown (recommended) or a ProseMirror JSON string. HTML is tolerated best-effort: a mapped tag becomes its node or mark, an unmapped tag is kept as literal text, and styling and decorative wrappers are dropped and listed in `import_warnings` on the response. Mutually exclusive with `operations`."
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "page_style": {
+            "type": "object",
+            "properties": {
+              "margins": {
+                "type": "object",
+                "properties": {
+                  "top": {
+                    "type": "number"
+                  },
+                  "bottom": {
+                    "type": "number"
+                  },
+                  "left": {
+                    "type": "number"
+                  },
+                  "right": {
+                    "type": "number"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "pageSize": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "width": {
+                        "type": "number"
+                      },
+                      "height": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "width",
+                      "height"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "letter",
+                      "A4",
+                      "legal"
+                    ]
+                  }
+                ]
+              },
+              "orientation": {
+                "type": "string",
+                "enum": [
+                  "portrait",
+                  "landscape"
+                ]
+              },
+              "pageless": {
+                "description": "Pageless (continuous) layout toggle."
+              },
+              "backgroundColor": {
+                "description": "Canvas background: `default`/`white`/`dark` preset or 6-digit hex."
+              }
+            },
+            "additionalProperties": false
+          },
+          "suggesting": {
+            "type": "boolean",
+            "description": "Commenter-relaxed write: content changes must carry track-change marks (auto-wrapped for agents)."
+          },
+          "operations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "replace",
+                    "insert_after"
+                  ]
+                },
+                "blockId": {
+                  "type": "string"
+                },
+                "content": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "type",
+                "blockId",
+                "content"
+              ],
+              "additionalProperties": false
+            },
+            "description": "Block-id-targeted edits as an alternative to `content` replacement. `content` field on each op is Markdown that is converted to PM JSON and applied at the matched blockId."
+          }
+        },
+        "additionalProperties": false
+      },
+      "DeletedResponse": {
+        "type": "object",
+        "properties": {
+          "deleted": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          }
+        },
+        "required": [
+          "deleted"
+        ]
+      },
+      "TaskListSort": {
+        "type": "string",
+        "enum": [
+          "updated_at",
+          "sort_order",
+          "created_at",
+          "due_date",
+          "priority"
+        ],
+        "description": "Sort order for `GET /api/tasks`. `updated_at` (recently-touched first) is the default; `sort_order` for board / drag-reorder; `created_at` for chronology; `due_date` for deadline proximity; `priority` for urgency ranking."
+      },
+      "TaskListResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Task"
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "status_counts": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "Count per system status across the whole filter, not just this page."
+          },
+          "custom_status_counts": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "Count per custom status id across the whole filter, not just this page."
+          },
+          "blocked_task_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "IDs of tasks in `data` whose dependencies are not all done."
+          },
+          "archived_count": {
+            "type": "integer",
+            "description": "Count of archived tasks matching the filter (regardless of `showArchived`)."
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "next_cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Echo of the request `limit` (offset mode only)."
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Echo of the request `offset` (offset mode only)."
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "status_counts",
+          "custom_status_counts",
+          "blocked_task_ids",
+          "archived_count",
+          "has_more"
+        ],
+        "description": "Response body for `GET /api/tasks`."
+      },
+      "Task": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/TaskPriority"
+          },
+          "assignee_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "creator_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "due_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "YYYY-MM-DD"
+          },
+          "start_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "YYYY-MM-DD. With `due_date`, defines a date range for the task."
+          },
+          "parent_task_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "project_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "contact_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "CRM contact this task is associated with. Auto-logs CRM activities."
+          },
+          "deal_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "CRM deal this task is associated with."
+          },
+          "sort_order": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Drag-reorder weight. Lower sorts first."
+          },
+          "task_key": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Workspace-scoped human-readable key like `WS-123`. Stable across renames."
+          },
+          "task_status_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Custom status ID (overrides system `status` category). When set, the system `status` field is synced from the custom status's category."
+          },
+          "recurrence_rule": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "RRULE string per RFC 5545 (e.g. `FREQ=WEEKLY;BYDAY=MO`). When set, completing the task spawns the next occurrence."
+          },
+          "estimate": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Story-point estimate (typically 1, 2, 3, 5, 8, 13). Used in velocity reports."
+          },
+          "estimated_minutes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Time-budget estimate in minutes. Used in workload + analytics reports."
+          },
+          "time_spent_minutes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Sum of time-tracking entries for this task. Auto-updated when time entries are logged or removed."
+          },
+          "custom_field_values": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {},
+            "description": "Per-task values keyed by `task_custom_fields.id`. Shape varies by field type (string, number, ISO date, array of option ids, etc.)."
+          },
+          "goal_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "OKR-style goal this task contributes to. Drives goal progress aggregates."
+          },
+          "cycle_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Sprint/cycle this task is scheduled in."
+          },
+          "first_response_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Timestamp of the first response (status change off `todo`). Drives the response SLA timer."
+          },
+          "due_date_source": {
+            "$ref": "#/components/schemas/TaskDueDateSource"
+          },
+          "sla": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TaskSlaSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "completed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Set when status flips to `done` or `cancelled`. Cleared on un-complete."
+          },
+          "archived_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Soft-archive timestamp. Archived tasks are hidden from default list filters."
+          },
+          "trashed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Soft-delete timestamp. Trashed tasks are restorable for 30 days."
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskLabelEmbed"
+            },
+            "description": "Labels applied to this task, in display order."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "creator": {
+            "$ref": "#/components/schemas/TaskUserSummary"
+          },
+          "assignee": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TaskUserSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "subtask_count": {
+            "type": "integer",
+            "description": "Count of direct child tasks (subtasks). Hydrated on list responses."
+          },
+          "comment_count": {
+            "type": "integer",
+            "description": "Count of top-level comment threads on this task. Hydrated on list responses."
+          },
+          "subscriber_count": {
+            "type": "integer",
+            "description": "Count of users subscribed to this task. Hydrated on list responses."
+          },
+          "subscriber_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "User IDs of subscribers. Echoed on create/update/list so callers avoid a second GET to the subscriptions sub-resource."
+          },
+          "pr_count": {
+            "type": "integer",
+            "description": "Count of GitHub PRs linked to this task via the changelog / dev-tools integration."
+          },
+          "latest_pr_status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Status of the most-recent linked PR (open / merged / closed)."
+          },
+          "subscribers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "primary_email": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "avatar_url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "reason": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "user_id",
+                "display_name",
+                "primary_email",
+                "reason"
+              ]
+            },
+            "description": "Users subscribed to this task (notified on changes). Returned on single-task GET to avoid forcing a second round-trip to the subscriptions sub-resource."
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "status",
+          "priority",
+          "creator_id",
+          "created_at",
+          "updated_at"
+        ],
+        "description": "Full task entity as returned by `GET /api/tasks/:id`."
+      },
+      "TaskStatus": {
+        "type": "string",
+        "enum": [
+          "todo",
+          "in_progress",
+          "done",
+          "cancelled",
+          "blocked"
+        ],
+        "description": "System task status category. Drives the built-in board columns."
+      },
+      "TaskPriority": {
+        "type": "string",
+        "enum": [
+          "urgent",
+          "high",
+          "medium",
+          "low"
+        ],
+        "description": "Task priority. Determines SLA timer and sort weight."
+      },
+      "TaskDueDateSource": {
+        "type": "string",
+        "enum": [
+          "manual",
+          "sla"
+        ],
+        "description": "Who set the task's due date. `manual` = user-entered; `sla` = auto-set by the priority SLA policy. Persists across updates so SLA bumps don't overwrite explicit edits."
+      },
+      "TaskSlaSummary": {
+        "type": "object",
+        "properties": {
+          "response": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TaskSlaCheckpoint"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TaskSlaCheckpoint"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "response",
+          "resolution"
+        ],
+        "description": "SLA tracker. `null` legs mean the SLA timer hasn't been initialized for this task."
+      },
+      "TaskSlaCheckpoint": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "on_track",
+              "at_risk",
+              "breached",
+              "achieved",
+              "failed"
+            ]
+          },
+          "elapsed_minutes": {
+            "type": "integer"
+          },
+          "target_minutes": {
+            "type": "integer"
+          },
+          "remaining_minutes": {
+            "type": "integer"
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "status",
+          "elapsed_minutes",
+          "target_minutes",
+          "remaining_minutes",
+          "deadline"
+        ],
+        "description": "One leg of the SLA tracker: either response (time to first reply / status change) or resolution (time to done)."
+      },
+      "TaskLabelEmbed": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "project_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "`null` for workspace-level labels; project UUID for project-scoped labels."
+          },
+          "name": {
+            "type": "string"
+          },
+          "group_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "color": {
+            "type": "string"
+          },
+          "icon": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "group_name",
+          "color",
+          "icon"
+        ],
+        "description": "Label as it appears embedded on a task response."
+      },
+      "TaskUserSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "primary_email": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "email"
+          },
+          "avatar_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "human",
+              "agent"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "display_name",
+          "primary_email"
+        ],
+        "description": "Compact user reference embedded on task creator/assignee. Avoids forcing the client to do a second lookup for the common name+email+avatar render. `primary_email` may be null for accounts without a verified email; `avatar_url` is null when the user has no avatar (clients render initials)."
+      },
+      "TaskCreateInput": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "description": "Task title. Required. Max 255 chars; trimmed before insert."
+          },
+          "description": {
+            "type": "string",
+            "description": "Markdown body. Rendered with the standard task-card markdown subset."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "todo",
+              "in_progress",
+              "done",
+              "cancelled",
+              "blocked"
+            ],
+            "description": "Initial status. Defaults to `todo`. If `task_status_id` is also set, that takes precedence and `status` is overridden by the custom status's category."
+          },
+          "task_status_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Custom status ID; overrides `status` category."
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "urgent",
+              "high",
+              "medium",
+              "low"
+            ],
+            "description": "Defaults to `medium`."
+          },
+          "assignee_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "User to assign the task to. Must be in the caller's workspace (403 otherwise). Omit for unassigned."
+          },
+          "due_date": {
+            "type": "string",
+            "format": "date",
+            "description": "ISO 8601 date (YYYY-MM-DD). If unset and a `priority` is given, the SLA policy auto-sets a due date and stamps `due_date_source: 'sla'`."
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "description": "ISO 8601 date (YYYY-MM-DD); with `due_date` defines a date range."
+          },
+          "parent_task_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Parent task for subtasks. Omit for top-level tasks."
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "contact_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Link the task to a CRM contact; auto-logs a CRM activity row."
+          },
+          "deal_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Link the task to a CRM deal."
+          },
+          "sort_order": {
+            "type": "number",
+            "description": "Drag-reorder weight. Lower sorts first."
+          },
+          "recurrence_rule": {
+            "type": "string",
+            "description": "RFC 5545 RRULE string. When set, completing the task spawns the next occurrence."
+          },
+          "estimate": {
+            "type": "integer",
+            "description": "Story-point estimate (typically 1, 2, 3, 5, 8, 13)."
+          },
+          "estimated_minutes": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "description": "Time-budget estimate in minutes."
+          },
+          "custom_field_values": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "Per-task custom-field values keyed by `task_custom_fields.id`."
+          },
+          "goal_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Link the task to an OKR-style goal."
+          },
+          "cycle_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Sprint/cycle this task is scheduled in."
+          },
+          "label_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Labels to assign at create time. Each ID must reference a label in the caller's workspace (404 otherwise)."
+          },
+          "subscriber_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Users to subscribe to the task at create time so they receive update notifications. Each must be a member of the caller's workspace; IDs outside the workspace are silently skipped. Use to link a bug reporter to the filed task."
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "additionalProperties": false,
+        "description": "Body of `POST /api/tasks`. Captures the union of fields any surface accepts."
+      },
+      "TaskCreateResponse": {
+        "type": "object",
+        "properties": {
+          "task": {
+            "$ref": "#/components/schemas/Task"
+          }
+        },
+        "required": [
+          "task"
+        ],
+        "description": "Response body for `POST /api/tasks`. Wrapped in `{ task }` for legacy compatibility."
+      },
+      "TaskId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "TaskWrappedResponse": {
+        "type": "object",
+        "properties": {
+          "task": {
+            "$ref": "#/components/schemas/Task"
+          }
+        },
+        "required": [
+          "task"
+        ]
+      },
+      "TaskUpdateInput": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus"
+          },
+          "task_status_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/TaskPriority"
+          },
+          "assignee_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "due_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "due_date_source": {
+            "type": "string",
+            "enum": [
+              "manual",
+              "sla"
+            ],
+            "description": "Defaults to `manual` when `due_date` changes through this update. Set explicitly to `sla` to mark a system-set due date."
+          },
+          "start_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "parent_task_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "project_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "contact_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "deal_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "sort_order": {
+            "type": "number"
+          },
+          "recurrence_rule": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "estimate": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "estimated_minutes": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "time_spent_minutes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Manual override; usually auto-managed by time entries."
+          },
+          "custom_field_values": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "goal_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "cycle_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "subscriber_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Users to subscribe to this task so they receive update notifications. Additive â existing subscribers are untouched. Each must be a workspace member; IDs outside the workspace are silently skipped. Use to backfill a bug reporter onto an existing task."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Body of `PATCH /api/tasks/:id`. All fields optional; `null` clears nullable fields."
+      },
+      "ContactsListResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Contact"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "next_cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "exclusiveMinimum": 0
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "has_more"
+        ]
+      },
+      "Contact": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "owner_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ContactType"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "company_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "website": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "industry": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lifecycle_stage": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LifecycleStage"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "custom_properties": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {}
+          },
+          "lead_score": {
+            "type": "integer",
+            "description": "Sum of matched scoring-rule points. Defaults to 0."
+          },
+          "avatar_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "last_contacted_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "company": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CompanyRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "owner": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CrmUserRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "file_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "activity_count": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "owner_id",
+          "type",
+          "name",
+          "email",
+          "phone",
+          "company_id",
+          "title",
+          "website",
+          "industry",
+          "lifecycle_stage",
+          "lead_score",
+          "avatar_url",
+          "last_contacted_at",
+          "created_at",
+          "updated_at",
+          "file_count",
+          "activity_count"
+        ]
+      },
+      "ContactType": {
+        "type": "string",
+        "enum": [
+          "person",
+          "company"
+        ],
+        "description": "`person` is a human contact; `company` is the organisation entity."
+      },
+      "LifecycleStage": {
+        "type": "string",
+        "enum": [
+          "subscriber",
+          "lead",
+          "mql",
+          "sql",
+          "opportunity",
+          "customer",
+          "evangelist"
+        ],
+        "description": "HubSpot-style funnel stage. Drives default board columns and per-stage automation."
+      },
+      "CompanyRef": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "industry": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "website": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "CrmUserRef": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "primary_email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "display_name",
+          "primary_email"
+        ]
+      },
+      "ContactCreateInput": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ContactType"
+          },
+          "name": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "company_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "website": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "industry": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lifecycle_stage": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LifecycleStage"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "custom_properties": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        },
+        "additionalProperties": false,
+        "description": "Create a CRM contact. `name` is the canonical field; `first_name`/`last_name` are accepted as a HubSpot-style alias and concatenated to `name` server-side. `type` defaults to `person` when `first_name`/`last_name` are provided. Sending both `name` and `first_name`/`last_name` with conflicting values 400s. Unknown keys are rejected with 400 so a mistyped field (e.g. camelCase `customProperties`) fails loudly instead of silently dropping data."
+      },
+      "ContactResponse": {
+        "type": "object",
+        "properties": {
+          "contact": {
+            "$ref": "#/components/schemas/Contact"
+          }
+        },
+        "required": [
+          "contact"
+        ]
+      },
+      "DuplicateContactError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "contact_id": {
+            "type": "string"
+          },
+          "contact_name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error",
+          "contact_id",
+          "contact_name"
+        ]
+      },
+      "ContactId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "ContactUpdateInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "company_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "website": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "industry": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lifecycle_stage": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LifecycleStage"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "custom_properties": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {}
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

@@ -16,9 +16,14 @@
     "postinstall": "wxt prepare"
   },
   "dependencies": {
+    "@ag-ui/client": "0.0.59",
+    "@ag-ui/core": "0.0.59",
     "@agentlayer/contracts": "*",
+    "@copilotkit/react-core": "1.71.1",
     "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react-dom": "^19.2.4",
+    "rxjs": "7.8.1",
+    "zod": "4.6.2"
   },
   "devDependencies": {
     "@types/react": "^19.2.14",

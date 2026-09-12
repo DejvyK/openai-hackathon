@@ -1,3 +1,23 @@
+# Current v1 QA ? 2026-09-12
+
+The scaffold runbook below is archived historical evidence. Use README for current commands and configuration.
+
+Current local evidence:
+- `npm test`: 55 API/research/workspace and 6 contracts tests passed.
+- `npm run typecheck`: passed across all workspaces.
+- `npm run build`: API and extension passed; dependency annotation warnings only.
+- `node apps/extension/tests/browser-tests.mjs`: five grouped synthetic browser scenarios passed, no page errors. Includes three profile variants, selection note, literal text, optional date, partial/reused retry, timeout reconciliation and context changes.
+- `npm run test:e2e`: built extension and local API passed options pairing, v1 settings, extraction, no duplicate mounting, fail-closed research, SPA invalidation and invalid-token feedback. Screenshot `.agentlayer/extension-smoke.png`.
+- `/ready`: local-api, protocol v1, demo. This is process readiness, not provider connectivity.
+
+Unverified: native toolbar click, three actual profiles/two actual articles, live OpenAI/Exa research, actual Ambiguous contact/task/document links and read-back, clean-profile full live journey, event rules and submission assets. No external writes were made in this verification.
+
+For live acceptance, record the actual context URL and timestamp, model/Exa run metadata and citations, reviewed fields/date, save request ID, actual contact/task/note IDs, authoritative read-back and opened URLs. Redact secrets. Record partial/unknown separately; never substitute fixture IDs for provider records.
+
+---
+
+## Archived scaffold QA (not current instructions)
+
 # AgentLayer scaffold QA
 
 This is a manual runbook, not a completed test report. QA author inspected source only; no browser session, install, server launch or external provider request was performed. Record actual results below after execution.
@@ -7,7 +27,7 @@ This is a manual runbook, not a completed test report. QA author inspected sourc
 Use Node 22 or newer. Run commands from the repository root in PowerShell. The coordinator owns the single workspace install and lockfile.
 
 ```powershell
-npm install
+npm install --os=win32 --cpu=x64
 npm run typecheck
 npm test
 npm run build
@@ -68,4 +88,23 @@ A future live check needs actual sourced research and a real task verified in th
 - Failure reproduction and visible error:
 - Evidence classification: local demo / actual supported website / live provider:
 
-No execution results have been entered by the QA author.
+### Coordinator verification — 2026-09-12
+
+- Local environment: Windows x64, Node 22.22.0. Existing global npm `os=linux` caused incompatible native dependency installation. Corrected this workspace install with `--os=win32 --cpu=x64`; global settings were not changed.
+- `npm install --os=win32 --cpu=x64 --include=optional --no-audit --no-fund`: exit 0 after correcting native packages and pinning compatible Vite/module versions.
+- `npm run typecheck`: exit 0 across API, extension and contracts.
+- `npm run build`: exit 0 across API and Chrome MV3 extension. Rollup emitted non-blocking annotation warnings from Zod dependency comments.
+- `npm test -w @agentlayer/api`: six tests passed, including authentication, bad URL/payload, size limit, idempotency and fail-closed live mode.
+- Built API started with `npm run start -w @agentlayer/api`. Verified loopback listener on port 4318, `/ready` response `{status:"ready",scope:"scaffold",mode:"demo",integrations:"not-implemented"}`, and `/demo` HTTP 200.
+- Real local HTTP requests completed research → demo task. Repeating the same task request returned the same ID, with `mode: demo` and `url: null`.
+- Built manifest inspected: activeTab, scripting and storage; loopback-only host permission; no automatic content scripts. Output: `apps/extension/.output/chrome-mv3`.
+- Browser loading, injected card interaction and real LinkedIn extraction were **not tested**. OpenAI, Exa and Ambiguous integrations are **not implemented**. This evidence confirms the local scaffold and demo API only.
+
+### Follow-up: reported Not found fixed and browser tested — 2026-09-12
+
+- Playwright reproduced `GET /` returning HTTP 404 with `Not found.`. `/demo` already worked. Added `/` → `/demo` redirect; after rebuilding/restarting, Playwright received final HTTP 200 and the Alex Morgan profile heading. Unknown routes still return 404.
+- API regression suite now passes 7/7. Full workspace typecheck and affected API/extension builds pass.
+- Added `tests/e2e/extension-smoke.mjs` / `npm run test:e2e` using Playwright Chromium with the real built extension and real demo backend, no mocked API responses. It passed Options pairing, script injection, duplicate-mount prevention, research, edited task save, SPA invalidation, invalid-token feedback and absence of page errors.
+- The browser test found an ambiguous accessible label for the populated Description textarea. The label now references the field explicitly; exact-label lookup and editing pass.
+- Screenshot inspected: `.agentlayer/extension-smoke.png`. It shows the edited task saved and explicit demo labels.
+- Scope supersedes the earlier browser-unverified note for the local demo. The test injects the bundled script through the real extension service worker because Playwright does not control the native toolbar surface. Actual toolbar clicking, LinkedIn extraction and live provider integrations remain unverified.

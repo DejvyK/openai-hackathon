@@ -1,5 +1,7 @@
 # AgentLayer — plán hackathonu
 
+Aktuální doplnění: solo tým David Král. SF portal cutoff je 12. 9. 16:30 PDT / 13. 9. 01:30 CEST, dle handbooku rozhoduje portál. Nové požadavky a způsobilost: [EVENT-REQUIREMENTS.md](submission/EVENT-REQUIREMENTS.md), kompletní odevzdání: [RELEASE-CHECKLIST.md](submission/RELEASE-CHECKLIST.md).
+
 Aktualizováno: 12. 9. 2026. Podklad: koncept a pravidla soutěže vložené uživatelem do konverzace. Po sepsání plánu uživatel zadal přípravu boilerplate a rozdělení práce mezi agenty. Aktuální kostru a spuštění popisuje [README](../README.md), vlastnictví modulů [AGENT-TASKS](AGENT-TASKS.md). Demo scaffold není splněné živé P0.
 
 ## 1. Časový rámec a doporučení
@@ -14,7 +16,7 @@ Nejdůležitější produktový moment: uživatel je na profilu, AgentLayer nab�
 
 Téma: agent se objeví tam, kde lidé už pracují, komunikují nebo žijí; prostředí musí smysluplně zlepšovat jeho možnosti.
 
-Dodané materiály uvádějí OpenAI jako marquee sponsor a CopilotKit, OpenRouter, Exa, Auth0, Ambiguous AI, Trigger.dev, Mozilla a Google Cloud Run jako sponsory. Nevyplývá z nich povinnost použít všechny ani potvrzení konkrétní ceny za Ambiguous AI. Dřívější zmínku o této speciální ceně bereme jako neověřenou, dokud ji nepotvrdí pravidla.
+Dodané materiály uvádějí OpenAI jako marquee sponsor a CopilotKit, OpenRouter, Exa, Auth0, Ambiguous AI, Trigger.dev, Mozilla a Google Cloud Run jako sponsory. Použití všech sponsorů není povinné. Aktualizace: event page nyní potvrzuje Best Use of Ambiguous AI (DGX Spark pro tým) a Best Use of CopilotKit. Viz docs/submission/EVENT-REQUIREMENTS.md.
 
 | Hodnoticí kritérium | Co konkrétně ukázat |
 | --- | --- |
@@ -103,15 +105,15 @@ Pokud vznikne kontakt a selže task, UI ukáže částečný úspěch a opakuje 
 - [ ] Klíče nejsou v extension bundle, DOM ani repozitáři.
 - [ ] README popisuje spuštění a skutečné limity; demo používá pravdivě označená živá data nebo zálohu.
 
-Automatizované kontroly soustředit na extrakci uložených vzorků, validaci návrhu a stav zápisu/retry. Hlavní důkaz je jeden živý end-to-end průchod, ne samotné unit testy. Délka videa a formát submission zatím nejsou v dodaném materiálu uvedené.
+Automatizované kontroly soustředit na extrakci uložených vzorků, validaci návrhu a stav zápisu/retry. Hlavní důkaz je jeden živý end-to-end průchod, ne samotné unit testy. Požadované artefakty jsou potvrzené: title, popis, public GitHub, dvouminutové video a public social s partner tagy.
 
 ## 8. Demo a anglický pitch
 
-Navržené interní demo má 60–90 sekund; přizpůsobit skutečným pravidlům portálu. Ukázat profil, kontextovou akci, research se zdroji, krátkou editaci follow-upu, Save a skutečný záznam. Zmínit rozsah podporovaných stránek. Záložní nahrávku úspěšného živého průchodu jasně označit jako nahrávku.
+Submission video má dvě minuty; viz docs/submission/VIDEO-PLAN.md. Ukázat profil, kontextovou akci, research se zdroji, krátkou editaci follow-upu, Save a skutečný záznam. Zmínit rozsah podporovaných stránek. Záložní nahrávku úspěšného živého průchodu jasně označit jako nahrávku.
 
 > AgentLayer brings an agent directly into the page where you work. On a supported professional profile, it understands the person and company, researches relevant information with Exa, and prepares a sourced follow-up. You review the proposal and save it to Ambiguous AI without copying context into a chatbot. The page determines what the agent knows, which actions it offers, and what the resulting work refers to.
 
-Pro submission doplnit pouze skutečně dokončené funkce, použitý model/provider, spuštění, limity a důkaz integrací. Připravit projektový popis a odkazy; přesný seznam povinných polí a případnou veřejnost repozitáře ověřit v portálu.
+Pro submission doplnit pouze skutečně dokončené funkce, použitý model/provider, spuštění, limity a důkaz integrací. Připravit projektový popis a odkazy; veřejnost repozitáře je povinná; formulářové detaily ověřit v portálu.
 
 ## 9. Zbývající informace
 

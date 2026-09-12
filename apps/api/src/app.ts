@@ -1,14 +1,19 @@
-import { randomUUID, timingSafeEqual } from 'node:crypto';
+import { timingSafeEqual } from 'node:crypto';
 import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
-import {
-  ResearchRequestSchema,
-  CreateTaskRequestSchema,
-  type ResearchBrief,
-  type TaskResult,
-} from '@agentlayer/contracts';
+import { connectionStatus } from './config/readiness.js';
+import { createActionRoutes, type IntegrationPorts } from './routes/actions.js';
+import { LIMITS } from '@agentlayer/contracts/v1';
+import { apiError } from './routes/errors.js';
+import { ReactiveSessions, type ReactiveRunner } from './routes/reactive.js';
+import { ReactiveSnapshotRequestSchema, ReactiveControlRequestSchema } from '@agentlayer/contracts/reactive-v1';
+import { SlackReviewService, type SlackReviewOptions } from './slack/review.js';
+import { createSlackRoutes } from './routes/slack.js';
+import type { CopilotInspection } from './research/copilot-runtime.js';
+import type { GoogleCalendarService } from './calendar/index.js';
+import { createCalendarRoutes } from './routes/calendar.js';
 
-export interface AppOptions { token: string; mode: 'demo' | 'live' }
+export interface AppOptions { token: string; mode: 'demo' | 'live'; env?: Record<string, string | undefined>; integrations?: IntegrationPorts; reactiveRunner?: ReactiveRunner; copilot?: () => Promise<CopilotInspection>; calendar?: GoogleCalendarService; slack?: Pick<SlackReviewOptions, 'directory' | 'provider'>; onShutdown?: (close: () => void) => void }
 
 function matchesToken(actual: string, expected: string): boolean {
   const a = Buffer.from(actual);
@@ -16,70 +21,96 @@ function matchesToken(actual: string, expected: string): boolean {
   return a.length === b.length && timingSafeEqual(a, b);
 }
 
-export function createApp({ token, mode }: AppOptions) {
+export function createApp({ token, mode, env = {}, integrations, reactiveRunner, copilot, calendar, slack, onShutdown }: AppOptions) {
   if (!token) throw new Error('Pairing token must not be empty.');
   const app = new Hono();
-  const tasks = new Map<string, { fingerprint: string; result: TaskResult }>();
-  app.onError(() => Response.json({ error: 'Unexpected server error.' }, { status: 500 }));
-  app.notFound((c) => c.json({ error: 'Not found.' }, 404));
-  app.get('/ready', (c) => c.json({ status: 'ready', scope: 'scaffold', mode, integrations: 'not-implemented' }));
+  const actions = createActionRoutes(mode, integrations);
+  const reactive = reactiveRunner ? new ReactiveSessions(reactiveRunner) : null;
+  const slackReview = mode === 'live' && slack && reactive ? new SlackReviewService({ ...slack, getCurrent: sessionId => reactive.currentContext(sessionId) }) : null;
+  onShutdown?.(() => reactive?.close());
+  app.onError(() => apiError('INTERNAL_ERROR', 'Unexpected server error.', 500));
+  app.notFound((c) => apiError('NOT_FOUND', 'Not found.', 404));
+  app.get('/', (c) => c.redirect('/demo'));
+  app.get('/ready', (c) => c.json({ status: 'ready', scope: 'local-api', mode, protocol: 'v1', reactive: { status: reactive ? 'configured' : 'unavailable', inferenceVerified: false } }));
   app.get('/demo', (c) => c.html(`<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><title>AgentLayer demo profile</title>
 <style>body{font:18px system-ui;max-width:760px;margin:80px auto;padding:24px;color:#172033;background:#f4f6fa}article{background:white;border:1px solid #dae0eb;padding:36px;border-radius:20px}p{line-height:1.6}.label{color:#895700;font-weight:700}</style></head>
-<body><p class="label">AgentLayer test fixture — fictional person, simulated workflow</p>
+<body><p class="label">AgentLayer test fixture — fictional person, local extraction check</p>
 <main><article data-agentlayer-profile><h1 data-agentlayer-name>Alex Morgan</h1>
 <p data-agentlayer-role>Founder at <span data-agentlayer-company>Example Studio</span></p>
 <p>We help small teams organize customer research. Select this text or activate AgentLayer to try the local demo.</p></article></main>
-<p>This is a local test page. Research and saved tasks are demo data, not Exa or Ambiguous AI results.</p></body></html>`));
+<p>This is a local test page. Workspace research and saving are disabled in demo mode. If configured, Codex can still analyze this page.</p></body></html>`));
   app.use('/api/*', async (c, next) => {
     if (!matchesToken(c.req.header('Authorization') ?? '', `Bearer ${token}`)) {
-      return c.json({ error: 'Invalid or missing pairing token.' }, 401);
+      return apiError('UNAUTHORIZED', 'Invalid or missing pairing token.', 401);
     }
     await next();
   });
-  app.use('/api/*', bodyLimit({ maxSize: 32 * 1024, onError: (c) => c.json({ error: 'Request exceeds 32 KB.' }, 413) }));
+  app.use('/api/*', bodyLimit({ maxSize: LIMITS.bodyBytes, onError: () => apiError('PAYLOAD_TOO_LARGE', 'Request exceeds 64 KB.', 413) }));
   app.use('/api/*', async (c, next) => {
-    if (!c.req.header('Content-Type')?.toLowerCase().startsWith('application/json')) {
-      return c.json({ error: 'Content-Type must be application/json.' }, 415);
+    if (!['GET', 'HEAD'].includes(c.req.method) && !c.req.header('Content-Type')?.toLowerCase().startsWith('application/json')) {
+      return apiError('UNSUPPORTED_MEDIA_TYPE', 'Content-Type must be application/json.', 415);
     }
     await next();
   });
+  app.get('/api/settings/connection', (c) => c.json(connectionStatus(mode, env)));
+  app.route('/', createCalendarRoutes(mode === 'live' ? calendar : undefined));
+  app.get('/api/settings/copilot', async c => copilot ? c.json(await copilot()) : c.json({ mode: 'disabled', credentialStatus: 'not_configured', agents: [] }));
+  for (const action of ['snapshots', 'control'] as const) app.post(`/api/reactive/${action}`, async c => {
+    if (!reactive) return apiError('REACTIVE_UNAVAILABLE', 'Page analysis runtime is not configured.', 503, 'research');
+    let body: unknown;
+    try { body = await c.req.json(); } catch { return apiError('INVALID_JSON', 'Invalid JSON.', 400, 'research'); }
+    const parsed = (action === 'snapshots' ? ReactiveSnapshotRequestSchema : ReactiveControlRequestSchema).safeParse(body);
+    if (!parsed.success) return apiError('INVALID_REACTIVE_REQUEST', 'Invalid page analysis request.', 400, 'research');
+    try { return c.json(action === 'snapshots' ? reactive.snapshot(parsed.data) : reactive.control(parsed.data)); }
+    catch (error) {
+      const code = error instanceof Error && ['SESSION_LIMIT', 'SESSION_NOT_FOUND', 'STALE_CONTROL'].includes(error.message) ? error.message : 'REACTIVE_REQUEST_FAILED';
+      return apiError(code, 'Page analysis request could not be accepted.', code === 'SESSION_LIMIT' ? 429 : 409, 'research');
+    }
+  });
+  app.get('/api/reactive/sessions/:sessionId/events', c => {
+    if (!reactive) return apiError('REACTIVE_UNAVAILABLE', 'Page analysis runtime is not configured.', 503, 'research');
+    const sessionId = c.req.param('sessionId');
+    try { reactive.assertCanSubscribe(sessionId); } catch (error) {
+      if (error instanceof Error && error.message === 'STREAM_LIMIT') return apiError('STREAM_LIMIT', 'This session already has an active event stream. Close it before reconnecting.', 409, 'research', true);
+      return apiError('SESSION_NOT_FOUND', 'Page analysis session was not found.', 404, 'research');
+    }
+    const encoder = new TextEncoder();
+    let cleanup = () => {};
+    const stream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        let closed = false;
+        let unsubscribe = () => {};
+        let timer: ReturnType<typeof setTimeout>;
+        const close = () => { if (closed) return; closed = true; clearTimeout(timer); unsubscribe(); c.req.raw.signal.removeEventListener('abort', close); try { controller.close(); } catch { /* Reader cancellation already closed the stream. */ } };
+        cleanup = close;
+        timer = setTimeout(close, 60_000); timer.unref();
+        c.req.raw.signal.addEventListener('abort', close, { once: true });
+        if (c.req.raw.signal.aborted) { close(); return; }
+        try {
+          unsubscribe = reactive.subscribe(sessionId, event => {
+            if (closed) return;
+            if ((controller.desiredSize ?? 0) <= 0) { close(); return; }
+            controller.enqueue(encoder.encode(`event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`));
+          });
+          if (closed) unsubscribe();
+        } catch { close(); }
+      },
+      cancel() { cleanup(); },
+    }, { highWaterMark: 256 });
+    return new Response(stream, { headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-store', 'X-Accel-Buffering': 'no' } });
+  });
+  app.route('/api/slack', createSlackRoutes(slackReview));
+  app.post('/api/actions/commit', async (c) => {
+    let body: unknown;
+    try { body = await c.req.json(); } catch { return apiError('INVALID_JSON', 'Invalid JSON.', 400, 'commit'); }
+    return actions.commit(body, c.req.raw.signal);
+  });
+  app.get('/api/actions/:requestId', (c) => actions.reconcile(c.req.param('requestId'), c.req.raw.signal));
   app.post('/api/research', async (c) => {
     let body: unknown;
-    try { body = await c.req.json(); } catch { return c.json({ error: 'Invalid JSON.' }, 400); }
-    const parsed = ResearchRequestSchema.safeParse(body);
-    if (!parsed.success) return c.json({ error: 'Invalid page context.' }, 400);
-    if (mode === 'live') return c.json({ error: 'Live OpenAI and Exa integration is not implemented.' }, 501);
-    const { context } = parsed.data;
-    const brief: ResearchBrief = {
-      mode: 'demo',
-      contextId: context.contextId,
-      summary: `DEMO: Prepared from the supplied page context for ${context.name || context.title}. No external research was performed.`,
-      sources: [{ title: 'Supplied page (not independently verified)', url: context.url }],
-      task: {
-        title: `DEMO: Follow up with ${context.name || context.title}`,
-        description: `Draft suggestion: review ${context.name || context.title}${context.company ? ` at ${context.company}` : ''} and decide whether a follow-up is relevant.\nSource: ${context.url}\nNo externally verified facts.`,
-      },
-    };
-    return c.json(brief);
-  });
-  app.post('/api/tasks', async (c) => {
-    let body: unknown;
-    try { body = await c.req.json(); } catch { return c.json({ error: 'Invalid JSON.' }, 400); }
-    const parsed = CreateTaskRequestSchema.safeParse(body);
-    if (!parsed.success) return c.json({ error: 'Invalid task proposal.' }, 400);
-    if (mode === 'live') return c.json({ error: 'Live Ambiguous AI integration is not implemented.' }, 501);
-    const task = parsed.data;
-    const fingerprint = JSON.stringify([task.contextId, task.title, task.description]);
-    const previous = tasks.get(task.requestId);
-    if (previous) {
-      if (previous.fingerprint !== fingerprint) return c.json({ error: 'Request ID already belongs to a different task.' }, 409);
-      return c.json(previous.result);
-    }
-    if (tasks.size >= 1000) return c.json({ error: 'Demo session task limit reached. Restart the backend to reset.' }, 429);
-    const result: TaskResult = { mode: 'demo', id: `demo-${randomUUID()}`, title: task.title, url: null, status: 'created' };
-    tasks.set(task.requestId, { fingerprint, result });
-    return c.json(result, 201);
+    try { body = await c.req.json(); } catch { return apiError('INVALID_JSON', 'Invalid JSON.', 400, 'research'); }
+    return actions.research(body, c.req.raw.signal);
   });
   return app;
 }

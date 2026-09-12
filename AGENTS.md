@@ -2,11 +2,13 @@
 
 ## Scope and truth
 
-Read `docs/PROJECT-CONCEPT.md`, `docs/HACKATHON-PLAN.md`, and `docs/AGENT-TASKS.md` first. Build one contextual profile-to-task workflow. The scaffold's demo mode is development infrastructure, not a working AI or Ambiguous integration. Never report mock research or an in-memory task as a live provider result.
+Latest MVP direction: read `docs/LINKEDIN-SLACK-MVP.md` before planning new delivery work. The requested demo uses David's actual LinkedIn URLs `https://www.linkedin.com/in/darth-vader/` then `https://www.linkedin.com/in/william-bryk/`, an optional session goal, Exa-backed assessment and a reviewed Slack send. Do not create substitute profile/test pages. Existing Ambiguous workflows and accepted evidence remain intact, but are not the new demo's critical path. Local integration evidence is in `docs/handoffs/linkedin-slack-integration.md`; it does not prove live browser acceptance. Slack destination/access remain user inputs. Never force a verdict from a profile name.
+
+Read `docs/PROJECT-CONCEPT.md` and the active `docs/DELIVERY-PLAN.json` first. Current user scope is planning only until further implementation is requested. The target includes a profile-to-contact-and-follow-up workflow and a selection-to-research-note workflow. `docs/HACKATHON-PLAN.md` and `docs/AGENT-TASKS.md` retain the earlier scaffold/time-box context; the delivery plan takes precedence for new task ownership and acceptance. The scaffold's demo mode is development infrastructure, not a working AI or Ambiguous integration. Never report mock research or an in-memory task as a live provider result.
 
 ## Parallel ownership
 
-The user authorized parallel agent work. Use the bounded ownership assignments in `docs/AGENT-TASKS.md`. Agents share this checkout: do not revert another agent's changes. Root manifest, lockfile, shared schemas and cross-module integration belong to the coordinator. Ask the coordinator for a contract change before changing another owner's interface.
+The user authorized planning for parallel agents. During subsequently requested implementation, use the bounded ownership assignments in `docs/DELIVERY-PLAN.json`. Four roles are A (extension), B (research), C (workspace actions), and D (contracts/integration/QA, also the coordinator). Agents share this checkout: do not revert another agent's changes. Root manifest, lockfile, shared schemas and cross-module integration belong to D. Ask D for a contract change before changing another owner's interface.
 
 ## Contracts and data
 

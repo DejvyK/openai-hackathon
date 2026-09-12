@@ -3,19 +3,31 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "workspaces": ["apps/*", "packages/*"],
-  "engines": { "node": ">=22.18" },
-  "overrides": { "vite": "7.3.6" },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22.18"
+  },
+  "overrides": {
+    "vite": "7.3.6"
+  },
   "scripts": {
     "dev": "concurrently -k -n api,extension \"npm run dev:api\" \"npm run dev:extension\"",
     "dev:api": "npm run dev -w @agentlayer/api",
     "dev:extension": "npm run dev -w @agentlayer/extension",
     "build": "npm run build --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present"
+    "test": "npm run test --workspaces --if-present && npm run test:extension",
+    "test:extension": "node --import tsx --test apps/extension/tests/reactive-state-tests.ts apps/extension/tests/reactive-goal-tests.ts apps/extension/tests/reactive-connection-tests.ts apps/extension/tests/copilot-agent-tests.ts",
+    "test:e2e": "node tests/e2e/extension-smoke.mjs"
   },
   "devDependencies": {
+    "@wxt-dev/module-react": "1.1.5",
     "concurrently": "^10.0.5",
-    "typescript": "~5.9.3"
+    "playwright": "^1.61.1",
+    "typescript": "~5.9.3",
+    "vite": "7.3.6"
   }
 }

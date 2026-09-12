@@ -3,7 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
-  "scripts": { "typecheck": "tsc --noEmit" },
-  "dependencies": { "zod": "^4.6.2" }
+  "exports": {
+    ".": "./src/index.ts",
+    "./v1": "./src/v1.ts",
+    "./fixtures/v1": "./src/fixtures/v1.ts",
+    "./reactive-v1": "./src/reactive-v1.ts",
+    "./calendar-v1": "./src/calendar-v1.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test src/v1.test.ts src/reactive-v1.test.ts"
+  },
+  "dependencies": {
+    "zod": "^4.6.2"
+  }
 }

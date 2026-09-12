@@ -1,5 +1,7 @@
 # Rozdělení práce mezi agenty
 
+Aktuální autoritativní plán je [DELIVERY-PLAN.json](DELIVERY-PLAN.json). Obsahuje čtyři samostatné role A/B/C/D, cílové průchody, úkoly s `done: false`, přesné vlastnictví, závislosti a podmínky dokončení. Níže je původní rozdělení pro vznik boilerplate; při rozdílu v názvu agenta či vlastnictví platí nový plán.
+
 ## Zvolený základ
 
 Používáme strukturu npm workspaces, oficiální WXT React/TypeScript starter pro extension a malý Hono Node server. Nevytváříme vlastní extension bundler ani nekopírujeme velkou aplikaci s chatem, účty a databází.

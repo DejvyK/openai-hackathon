@@ -1,0 +1,3 @@
+# Local media intermediates and disposable validation copies.
+/intermediates/
+/test-temp-*/

@@ -9,3 +9,39 @@ dist/
 *.log
 .agentlayer/
 coverage/
+.playwright-mcp/
+
+# Local credentials and browser authentication state
+.envrc
+.npmrc
+*.pem
+*.key
+*.p12
+*.pfx
+playwright/.auth/
+
+# Generated test reports, screenshots and live provider responses
+playwright-report/
+test-results/
+/apps/extension/tests/evidence/
+/tests/e2e/evidence/
+/apps/api/tests/research/live-evidence/*.json
+!/apps/api/tests/research/live-evidence/contexts.json
+/apps/api/tests/workspace/live-*.json
+/docs/handoffs/*.json
+
+# Generated presentation media and copies of local run evidence
+/docs/production/video/*
+!/docs/production/video/.gitignore
+!/docs/production/video/README.md
+/docs/production/story/POSTER.png
+/docs/production/VIDEO-FRESHNESS.json
+
+# Local editor, OS and compiler caches
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tsbuildinfo

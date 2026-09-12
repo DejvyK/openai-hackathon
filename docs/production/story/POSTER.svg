@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title description">
+  <title id="title">AgentLayer — Keep the next step tied to its source</title>
+  <desc id="description">An original workflow explainer, not a product screenshot. Context leads to research, human review, and a planned workspace action. Three recorded backend research runs have live evidence. The complete browser-to-workspace journeys remain unverified. Built solo by David Král.</desc>
+  <rect width="1600" height="900" fill="#F4F3ED"/>
+  <g font-family="Arial, Helvetica, sans-serif" fill="#193B38">
+    <rect x="64" y="57" width="12" height="31" rx="3" fill="#34766B"/>
+    <text x="92" y="83" font-size="28" font-weight="700">AgentLayer</text>
+    <text x="1536" y="80" text-anchor="end" font-size="18" letter-spacing="1.5">WORKFLOW EXPLAINER · PROTOTYPE</text>
+    <text x="64" y="178" font-size="64" font-weight="700" letter-spacing="-2">Keep the next step</text>
+    <text x="64" y="250" font-size="64" font-weight="700" letter-spacing="-2">tied to its source.</text>
+    <text x="68" y="300" font-size="25" fill="#4C625C">From the page you are reading to work you can review.</text>
+
+    <path d="M398 459 H446 M778 459 H826 M1158 459 H1206" fill="none" stroke="#758D83" stroke-width="2"/>
+    <path d="M438 453 L446 459 L438 465 M818 453 L826 459 L818 465 M1198 453 L1206 459 L1198 465" fill="none" stroke="#758D83" stroke-width="2"/>
+
+    <rect x="64" y="359" width="334" height="286" rx="18" fill="#FFFFFF" stroke="#D5DED5"/>
+    <text x="88" y="400" font-size="17" letter-spacing="2" fill="#5C7068">01 / CONTEXT</text>
+    <text x="88" y="452" font-size="34" font-weight="700">Start on the page</text>
+    <text x="88" y="499" font-size="23">A person or a passage.</text>
+    <text x="88" y="532" font-size="23">Keep the source attached.</text>
+    <path d="M88 558 H374" stroke="#D5DED5"/>
+    <text x="88" y="595" font-size="19" fill="#5C7068">Profile → follow-up proposal</text>
+    <text x="88" y="623" font-size="19" fill="#5C7068">Selection → note proposal</text>
+
+    <rect x="444" y="359" width="334" height="286" rx="18" fill="#E1ECE4" stroke="#B5CBBE"/>
+    <text x="468" y="400" font-size="17" letter-spacing="2" fill="#426157">02 / RESEARCH</text>
+    <text x="468" y="452" font-size="34" font-weight="700">Find the evidence</text>
+    <text x="468" y="499" font-size="23">Gather relevant sources.</text>
+    <text x="468" y="532" font-size="23">Keep uncertainty visible.</text>
+    <path d="M468 558 H754" stroke="#B5CBBE"/>
+    <text x="468" y="595" font-size="19" fill="#426157">3 recorded live backend runs</text>
+    <text x="468" y="623" font-size="19" fill="#426157">Manually prepared contexts</text>
+
+    <rect x="824" y="359" width="334" height="286" rx="18" fill="#FFFFFF" stroke="#D5DED5"/>
+    <text x="848" y="400" font-size="17" letter-spacing="2" fill="#5C7068">03 / REVIEW</text>
+    <text x="848" y="452" font-size="34" font-weight="700">Choose the work</text>
+    <text x="848" y="499" font-size="23">Check facts and wording.</text>
+    <text x="848" y="532" font-size="23">Decide what to save.</text>
+    <path d="M848 558 H1134" stroke="#D5DED5"/>
+    <text x="848" y="595" font-size="19" fill="#5C7068">Drafts passed validation</text>
+    <text x="848" y="623" font-size="19" fill="#5C7068">Review UI tested locally</text>
+
+    <rect x="1204" y="359" width="332" height="286" rx="18" fill="#EEE8DB" stroke="#A28B5B" stroke-dasharray="6 5"/>
+    <text x="1228" y="400" font-size="17" letter-spacing="2" fill="#715E39">04 / WORKSPACE</text>
+    <text x="1228" y="452" font-size="34" font-weight="700">Carry it forward</text>
+    <text x="1228" y="499" font-size="23">Contact + follow-up</text>
+    <text x="1228" y="532" font-size="23">or a research note.</text>
+    <path d="M1228 558 H1512" stroke="#CCBFA3"/>
+    <text x="1228" y="595" font-size="19" font-weight="700" fill="#715E39">Target: Ambiguous workspace</text>
+    <text x="1228" y="623" font-size="19" fill="#715E39">Live saves still to verify</text>
+
+    <rect x="64" y="685" width="1472" height="117" rx="16" fill="#193B38"/>
+    <text x="88" y="726" font-size="18" letter-spacing="1.5" fill="#C6DCCE">VERIFICATION BOUNDARY</text>
+    <text x="88" y="770" font-size="29" font-weight="700" fill="#FFFFFF">Live research evidence. Full browser-to-workspace journeys still unverified.</text>
+    <text x="64" y="855" font-size="20">Built solo by David Král</text>
+    <text x="1536" y="855" text-anchor="end" font-size="18" fill="#4C625C">12 September 2026 · Supporting illustration, not a product screenshot</text>
+  </g>
+</svg>

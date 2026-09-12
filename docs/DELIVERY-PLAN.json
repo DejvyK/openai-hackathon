@@ -1,0 +1,1310 @@
+{
+  "title": "AgentLayer — plán dodání cílového produktu",
+  "version": 2,
+  "active_mvp_spec": "docs/LINKEDIN-SLACK-MVP.md",
+  "active_sidebar_spec": "docs/MINIMAL-SIDEBAR.md",
+  "updated_at": "2026-09-12",
+  "done": false,
+  "mode": "implementation",
+  "language": "cs",
+  "authority": "Tento dokument nahrazuje staré rozdělení práce v AGENT-TASKS.md pro další implementaci. PROJECT-CONCEPT.md zůstává produktovou vizí; HACKATHON-PLAN.md je původní časový rámec.",
+  "execution_rule": "Implementace byla uzivatelem autorizovana 2026-09-12. Postupovat podle vlastnictvi, zavislosti a akceptace. Externi demo zapisy vyzaduji urceny workspace a zadany integracni rozsah.",
+  "status_policy": {
+    "initial_state": "Všechny položky začínají done:false, i když existuje použitelná kostra. Stav znamená přijetí cílové funkce, nikoli existenci souboru.",
+    "completion": "done:true nastavit až po splnění všech acceptance a doplnění evidence. Mock, screenshot fixture nebo build nejsou důkaz živé integrace.",
+    "blocked": "Při blokaci ponechat done:false, zapsat blocker a pokračovat nezávislými úkoly. Chybějící klíč není důvod pro označení live úkolu za hotový.",
+    "updates": "Stavy v tomto souboru mění pouze agent D na základě předání vlastníka. Ostatní zapisují důkazy do vlastních handoff souborů."
+  },
+  "starting_point": {
+    "description": "Existuje WXT/React extension, Hono backend, Zod contracts a explicitní demo režim. Není potřeba přestavba od nuly.",
+    "available_evidence": "V předchozím průchodu prošel build/typecheck, 7 API testů a Playwright demo tok. Root URL přesměrovává na /demo.",
+    "not_proven": [
+      "Skutečné ovládání toolbaru uživatelem",
+      "Spolehlivá extrakce LinkedIn profilů",
+      "Live OpenAI/Exa research",
+      "Vytvoření kontaktu/tasku v Ambiguous",
+      "Druhý kontext a změna akcí mezi prostředími"
+    ],
+    "caveat": "Před zahájením každý agent ověří aktuální stav své oblasti; tato fakta nenahrazují cílovou akceptaci."
+  },
+  "desired_end_result": {
+    "done": false,
+    "statement": "Uživatel na reálném podporovaném profilu aktivuje AgentLayer, dostane akci vedle relevantního obsahu, agent provede research osoby a firmy se zdroji, připraví upravitelný kontakt a follow-up a po Save vytvoří či znovu použije kontakt a uloží navázaný task v Ambiguous. Uživatel otevře oba skutečné záznamy. Na běžné obsahové stránce nabídne AgentLayer odlišné akce pro vybraný text a umí uložit výzkumnou poznámku.",
+    "required_journeys": [
+      {
+        "id": "J1",
+        "done": false,
+        "name": "Profil → research → CRM kontakt + follow-up",
+        "steps": [
+          "Aktivovat extension na skutečném LinkedIn profilu.",
+          "Rozpoznat osobu, roli, firmu a URL; neznámé údaje zůstanou prázdné a lze je opravit.",
+          "Nabídnout Research & prepare follow-up u profilu.",
+          "Agent volá Exa, posoudí shodu identity a vytvoří brief s citacemi.",
+          "Uživatel zkontroluje a upraví kontakt, task a případné datum follow-upu.",
+          "Save provede konkrétní schválené zápisy, bez automatického odesílání zpráv.",
+          "UI zobrazí skutečný stav každé operace a odkazy na kontakt i navázaný task."
+        ]
+      },
+      {
+        "id": "J2",
+        "done": false,
+        "name": "Vybraný obsah → research → uložená poznámka",
+        "steps": [
+          "Na jiné skutečné stránce vybrat text a aktivovat AgentLayer.",
+          "Nabídnout Research selection / Save research note místo kontaktového formuláře.",
+          "Zpracovat pouze relevantní výběr s URL, dohledat zdroje podle zvolené akce.",
+          "Po kontrole uložit skutečnou poznámku či dokument do Ambiguous a otevřít jej."
+        ],
+        "qualification": "Konkrétní typ notes/documents a endpoint ověří C. Task vydávaný za poznámku nesplňuje tento průchod."
+      }
+    ],
+    "product_limits": [
+      "Chrome desktop a explicitně podporované profily + obecný výběr textu.",
+      "Žádný příslib porozumění každé stránce; Every app je dlouhodobá vize.",
+      "Žádný automatický outreach, email sending nebo plošný sběr profilů.",
+      "GitHub řešení issues, mobil, více workspace a produkční distribuce jsou další etapa."
+    ]
+  },
+  "delivery_strategy": {
+    "done": false,
+    "full_target": "J1 + J2 + finální gates. Celý cíl není splněn pouze demo tokem ani samotným taskem.",
+    "hackathon_checkpoint": "Pro 255 minut může být dosažitelný jeden živý průchod. Pokud vznikne pouze task bez kontaktu nebo chybí J2, jde o označenou částečnou dodávku; zbývající úkoly zůstávají done:false.",
+    "estimate": "Pracovní odhad od současné kostry: 4 agenti, přibližně 5–8 hodin společného kalendářního času při dostupných účtech, stabilních API a rychlé integraci. Nejistota vysoká; nejde o závazek ani garantovaný rozsah za 255 minut.",
+    "checkpoints": [
+      {
+        "id": "M0",
+        "done": false,
+        "target": "Prvních 30 minut",
+        "result": "Schválené kontrakty, rozdělené soubory, zjištěný stav účtů. A/B/C mezitím pracují s fixtures."
+      },
+      {
+        "id": "M1",
+        "done": false,
+        "target": "Přibližně 60–120 minut",
+        "result": "Samostatně ověřené browser, research a workspace moduly."
+      },
+      {
+        "id": "M2",
+        "done": false,
+        "target": "Přibližně 120–210 minut",
+        "result": "První živý J1, chyby a read-back."
+      },
+      {
+        "id": "M3",
+        "done": false,
+        "target": "Do hackathonového freeze",
+        "result": "Rozhodnout, co je pravdivě demonstrovatelné, rezervovat čas na submission; nedokončené části neoznačit done."
+      },
+      {
+        "id": "M4",
+        "done": false,
+        "target": "Po J1 a před uzavřením plného cíle",
+        "result": "J2, negativní scénáře, nový browser profil a úplná finální akceptace."
+      }
+    ],
+    "submission_schedule": [
+      {
+        "id": "SM1",
+        "done": false,
+        "window": "Souběžně od začátku",
+        "owner": "A/B/C/D",
+        "result": "Scénář, texty, účty, tagy a portál připravit bez čekání na live demo."
+      },
+      {
+        "id": "SM2",
+        "done": false,
+        "window": "14:15–14:45 PDT",
+        "owner": "D + B",
+        "result": "Zmrazit rozsah a tvrzení podle evidence, nepřidávat nové sponsor integrace."
+      },
+      {
+        "id": "SM3",
+        "done": false,
+        "window": "14:45–15:15 PDT",
+        "owner": "A + D",
+        "result": "Nahrát 120s demo, exportovat, nahrát a připravit finální commit."
+      },
+      {
+        "id": "SM4",
+        "done": false,
+        "window": "15:15–15:30 PDT",
+        "owner": "B + C + D",
+        "result": "Finální copy, publikovaný social v zadaném rozsahu a anonymní kontrola odkazů."
+      },
+      {
+        "id": "SM5",
+        "done": false,
+        "window": "15:30–15:50 PDT",
+        "owner": "D",
+        "result": "Vyplnit a odeslat v portálu."
+      },
+      {
+        "id": "SM6",
+        "done": false,
+        "window": "15:50–16:00 PDT",
+        "owner": "D",
+        "result": "Rezerva na opravy a potvrzení; SF cutoff16:30PDT je pozdější než interní target."
+      }
+    ]
+  },
+  "shared_contracts": {
+    "done": true,
+    "owner": "D",
+    "policy": "Níže je navržené cílové rozhraní, nikoli tvrzení o současném kódu. D ho převede do packages/contracts a verzovaných fixtures. A/B/C vyvíjejí proti tomuto návrhu; při rozdílu požádají D o změnu, neupravují cizí soubory.",
+    "version": "v1",
+    "models": {
+      "PageContext": "schemaVersion, contextId, kind(profile|selection), url, pageTitle, capturedAt, person{name,role,company,profileUrl}|null, selection{text}|null, extractedEvidence[]. Neznámá pole null, zachovat zdroj pole.",
+      "ResearchBrief": "schemaVersion, contextId, mode(demo|live), summary, claims[{text,sourceIds}], sources[{id,title,url,retrievedAt}], identityStatus(matched|ambiguous|insufficient), warnings[], suggestions[]. Zdrojová ID se musí odkazovat na skutečné výsledky.",
+      "ActionProposal": "proposalId, contextId, mode, actionKind(contact_followup|research_note), person draft nebo note draft, task draft včetně optional dueAt, evidenceRefs, userEditedFields. Návrh je editovatelný; není potvrzením zápisu.",
+      "CommitRequest": "requestId, proposalId, contextId, actionKind, reviewedPayload. Backend ověří původní kontext/režim i whitelist upravitelných polí.",
+      "CommitResult": "requestId, contextId, status(succeeded|partial|failed|unknown), operations[{kind,status,id,url,errorCode,retryable}], warnings[]. Neznámý stav po timeoutu není failed ani succeeded.",
+      "ApiError": "code, message, retryable, requestId|null, operation|null. Čitelné UI texty bez tokenů a interních payloadů."
+    },
+    "interfaces": [
+      "A: extractPageContext(document, selection) -> PageContext; resolveActions(context) -> ActionDescriptor[].",
+      "B: research(context, {signal,limits}) -> ResearchBrief; navrhne podklady, nikdy nezapisuje do workspace.",
+      "C: commitReviewedAction(request, {workspace,signal}) -> CommitResult; reconcile(requestId) -> CommitResult.",
+      "D: POST /api/research, POST /api/actions/commit, GET /api/actions/:requestId; autentizace a schema validace. Stávající /api/tasks migrovat atomicky s extension.",
+      "D: /ready popisuje připravenost; detailní konfigurace a provider check pouze přes autentizované nastavení, bez zveřejnění secretů."
+    ],
+    "fixture_cases": [
+      "Úplný profil",
+      "Profil bez firmy/role",
+      "Dvě osoby stejného jména",
+      "Výběr z článku",
+      "Research bez zdrojů",
+      "Částečný contact/task úspěch",
+      "Timeout s neznámým zápisem",
+      "Změna kontextu během požadavku"
+    ],
+    "limits": "D sjednotí limity před nasazením; task title max255 dle dříve zjištěné Ambiguous specifikace. Research payload a počet tool calls mají explicitní konečný limit."
+  },
+  "agents": [
+    {
+      "id": "A",
+      "name": "Browser context & contextual UI",
+      "done": false,
+      "owns": [
+        "apps/extension/entrypoints/**",
+        "apps/extension/components/**",
+        "apps/extension/lib/**",
+        "apps/extension/adapters/**",
+        "apps/extension/tests/**",
+        "apps/extension/wxt.config.ts",
+        "docs/handoffs/agent-a.md"
+      ],
+      "excludes": [
+        "Všechny package.json a lockfile",
+        "packages/contracts/**",
+        "apps/api/**",
+        "tests/e2e/**"
+      ],
+      "start_without_other_agents": "Zkontrolovat aktuální extraction/UI; připravit lokální DOM fixtures a samostatné renderování kontextové karty proti navrženému kontraktu.",
+      "deliverable": "Ověřená extension pro profil i selection, s kompletním review/save/error UI.",
+      "tasks": [
+        {
+          "id": "A01",
+          "done": false,
+          "depends_on": [],
+          "title": "Vymezit podporované stránky a připravit DOM adaptéry",
+          "acceptance": [
+            "Oddělit obecný výběr textu a LinkedIn profil do samostatných adaptérů.",
+            "Připravit anonymizované vzorky alespoň tří variant profilu včetně chybějící firmy.",
+            "Zaznamenat selektory a jejich aktuální browser důkaz; neodvozovat firmu z libovolného textu."
+          ],
+          "evidence": [],
+          "blocker": null
+        },
+        {
+          "id": "A02",
+          "done": false,
+          "depends_on": [
+            "A01",
+            "D01"
+          ],
+          "title": "Kontext s původem dat a životním cyklem",
+          "acceptance": [
+            "Vracet validní PageContext s role/company/null a původem polí.",
+            "Změna URL i výměna entity v DOM zneplatní předchozí kontext.",
+            "Opožděná odpověď nikdy nepřepíše nový profil; remount a cleanup nevytvářejí duplicity."
+          ],
+          "evidence": [],
+          "blocker": null
+        },
+        {
+          "id": "A03",
+          "done": false,
+          "depends_on": [
+            "D01"
+          ],
+          "title": "Akce odpovídající prostředí",
+          "acceptance": [
+            "Profil nabízí kontakt/follow-up, selection výzkumnou poznámku.",
+            "Akce je u příslušného obsahu a nemění native formuláře hostitelské stránky.",
+            "Neznámý kontext nabízí výběr/opravu, nepředstírá rozpoznaný profil."
+          ],
+          "evidence": [],
+          "blocker": null
+        },
+        {
+          "id": "A04",
+          "done": false,
+          "depends_on": [
+            "A02",
+            "A03"
+          ],
+          "title": "Research karta se zdroji a nejistotou",
+          "acceptance": [
+            "Zobrazit průběh, relevantní zdroje, ambiguity a chybějící fakta.",
+            "Uživatel může opravit kontext a znovu spustit výzkum.",
+            "Text a URL vykreslovat bezpečně; demo/live režim je patrný."
+          ],
+          "evidence": [],
+          "blocker": null
+        },
+        {
+          "id": "A05",
+          "done": false,
+          "depends_on": [
+            "A04",
+            "D01"
+          ],
+          "title": "Review kontaktu, follow-upu a poznámky",
+          "acceptance": [
+            "Upravitelný název, firma, role a task/note obsah; nevyžadovat vymyšlený email.",
+            "Datum follow-upu je optional a explicitně zvolené/odsouhlasené uživatelem.",
+            "Save předá přesně zkontrolovaný návrh; změna kontextu vyžaduje nový návrh."
+          ],
+          "evidence": [],
+          "blocker": null
+        },
+        {
+          "id": "A06",
+          "done": false,
+          "depends_on": [
+            "A05"
+          ],
+          "title": "Save, částečný výsledek a bezpečné opakování",
+          "acceptance": [
+            "Rozlišit vytvořený/znovu použitý kontakt, task, note, partial a unknown.",
+            "Zachovat requestId a payload při opakování nejistého zápisu.",
+            "Otevřít skutečné odkazy vrácené backendem; žádné falešné potvrzení při timeoutu."
+          ],
+          "evidence": [],
+          "blocker": null
+        },
+        {
+          "id": "A07",
+          "done": false,
+          "depends_on": [
+            "D01"
+          ],
+          "title": "Nastavení a skutečná aktivace",
+          "acceptance": [
+            "Uživatel umí extension načíst, spárovat a zjistit připojení bez čtení zdrojáku.",
+            "API klíče se neukládají do extension; pairing chyby mají řešitelný text.",
+            "Ověřit skutečný klik na toolbar, nikoli pouze programatickou injekci."
+          ],
+          "evidence": [],
+          "blocker": null
+        },
+        {
+          "id": "A08",
+          "done": false,
+          "depends_on": [
+            "A06",
+            "A07"
+          ],
+          "title": "Předat ověřené UI",
+          "acceptance": [
+            "Zapsat browser verzi, podporované stránky a konkrétní postup.",
+            "Předat screenshoty a výsledky kontrol keyboard/focus, chyb i navigace.",
+            "Závady cizího modulu předat vlastníkovi s minimální reprodukcí."
+          ],
+          "evidence": [],
+          "blocker": null
+        },
+        {
+          "owner": "A",
+          "id": "SA01",
+          "title": "Scénář dvouminutového videa",
+          "depends_on": [],
+          "acceptance": [
+            "Připravit časování přesně 120 sekund, anglický voiceover a záběry.",
+            "Ukázat ověřený J1 a workspace výsledek; J2 pouze v přijatém rozsahu.",
+            "Připravit pravdivou omezenou variantu; žádné neoznačené mocky."
+          ],
+          "artifact": "docs/submission/VIDEO-PLAN.md",
+          "done": false,
+          "evidence": [],
+          "blocker": null
+        },
+        {
+          "owner": "A",
+          "id": "SA02",
+          "title": "Nahrát a exportovat skutečné demo",
+          "depends_on": [
+            "SA01",
+            "D06"
+          ],
+          "acceptance": [
+            "Nahrát finální build bez tajemství, s čitelným UI a zvukem.",
+            "Export má 120 sekund; případné přesnější limity/formát potvrdit portálem, nepředpokládat toleranci nad dvě minuty.",
+            "Přehrát celý export a zkontrolovat všechny zobrazené výsledky.",
+            "Předat soubor, délku a checksum; scénář není hotové video."
+          ],
+          "artifact": "docs/submission/VIDEO-PLAN.md",
+          "done": false,
+          "evidence": [],
+          "blocker": null
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "name": "Agent reasoning & Exa research",
+      "done": false,
+      "owns": [
+        "apps/api/src/research/**",
+        "apps/api/src/adapters/research.ts",
+        "apps/api/src/adapters/exa.ts",
+        "apps/api/tests/research/**",
+        "docs/handoffs/agent-b.md"
+      ],
+      "excludes": [
+        "apps/api/src/app.ts",
+        "apps/api/src/index.ts",
+        "Workspace adaptéry a zápisy",
+        "packages/contracts/**",
+        "Všechny package.json a lockfile"
+      ],
+      "start_without_other_agents": "Navrhnout research pipeline a malé vstupní/evidence fixtures. Bez klíče ověřit parsování, limity a chybové stavy; live úkol ponechat otevřený.",
+      "deliverable": "Jeden skutečný agent s bounded Exa nástrojem, strukturovaným výstupem a doloženými tvrzeními.",
+      "tasks": [
+        {
+          "id": "B01",
+          "done": true,
+          "depends_on": [],
+          "title": "Definovat výzkumnou strategii a eval příklady",
+          "acceptance": [
+            "Oddělit dotaz osoby, firmy a selection.",
+            "Připravit případy shody, jmenovců, absence výsledků a instrukcí vložených do webového obsahu.",
+            "Stanovit co je fakt, návrh a neznámý údaj."
+          ],
+          "evidence": [
+            "docs/handoffs/agent-b.md: owner acceptance matrix and 30 passing research tests.",
+            "apps/api/tests/research/live-evidence/README.md and broad-search-report.json: three actual provider runs, reviewed sources and latencies; initial-report.json preserves namesake/retrieval failures.",
+            "draft-validation.json validates reviewed profile and selection drafts; D integrated prepareResearchDraft into API.",
+            "tests/e2e/evidence/live-research-api.json: additional live API handler probe, profile ambiguous with no accepted claims and selection with one sourced claim. Browser/workspace gates are separate."
+          ],
+          "blocker": null
+        },
+        {
+          "id": "B02",
+          "done": true,
+          "depends_on": [
+            "D01",
+            "D02"
+          ],
+          "title": "OpenAI runtime a Exa adaptér",
+          "acceptance": [
+            "Použít jednu schválenou modelovou cestu a jeden agentní runtime.",
+            "Exa request má timeout, omezené výsledky a zachované URL/metadata.",
+            "Klíče pouze server-side; chybějící konfigurace nevrací demo úspěch."
+          ],
+          "evidence": [
+            "docs/handoffs/agent-b.md: owner acceptance matrix and 30 passing research tests.",
+            "apps/api/tests/research/live-evidence/README.md and broad-search-report.json: three actual provider runs, reviewed sources and latencies; initial-report.json preserves namesake/retrieval failures.",
+            "draft-validation.json validates reviewed profile and selection drafts; D integrated prepareResearchDraft into API.",
+            "tests/e2e/evidence/live-research-api.json: additional live API handler probe, profile ambiguous with no accepted claims and selection with one sourced claim. Browser/workspace gates are separate."
+          ],
+          "blocker": null
+        },
+        {
+          "id": "B03",
+          "done": true,
+          "depends_on": [
+            "B01",
+            "B02"
+          ],
+          "title": "Research s rozhodováním agenta",
+          "acceptance": [
+            "Agent podle kontextu zvolí dotazy a může je omezeně upravit při nejasné identitě.",
+            "Maximální počet tool calls, délka běhu a objem obsahu jsou v konfiguraci.",
+            "Výzkumný agent nemá k dispozici workspace write nástroje."
+          ],
+          "evidence": [
+            "docs/handoffs/agent-b.md: owner acceptance matrix and 30 passing research tests.",
+            "apps/api/tests/research/live-evidence/README.md and broad-search-report.json: three actual provider runs, reviewed sources and latencies; initial-report.json preserves namesake/retrieval failures.",
+            "draft-validation.json validates reviewed profile and selection drafts; D integrated prepareResearchDraft into API.",
+            "tests/e2e/evidence/live-research-api.json: additional live API handler probe, profile ambiguous with no accepted claims and selection with one sourced claim. Browser/workspace gates are separate."
+          ],
+          "blocker": null
+        },
+        {
+          "id": "B04",
+          "done": true,
+          "depends_on": [
+            "B03"
+          ],
+          "title": "Citace a shoda identity",
+          "acceptance": [
+            "Každé faktické claim odkazuje na existující evidence source.",
+            "Neshoda firmy nebo osoby je explicitně ambiguous; výsledky se neslučují automaticky.",
+            "Prázdný research je platný čitelný stav bez vymyšlených faktů."
+          ],
+          "evidence": [
+            "docs/handoffs/agent-b.md: owner acceptance matrix and 30 passing research tests.",
+            "apps/api/tests/research/live-evidence/README.md and broad-search-report.json: three actual provider runs, reviewed sources and latencies; initial-report.json preserves namesake/retrieval failures.",
+            "draft-validation.json validates reviewed profile and selection drafts; D integrated prepareResearchDraft into API.",
+            "tests/e2e/evidence/live-research-api.json: additional live API handler probe, profile ambiguous with no accepted claims and selection with one sourced claim. Browser/workspace gates are separate."
+          ],
+          "blocker": null
+        },
+        {
+          "id": "B05",
+          "done": true,
+          "depends_on": [
+            "B04"
+          ],
+          "title": "Návrh follow-upu a research note",
+          "acceptance": [
+            "Vytvořit užitečný krátký návrh z evidence pro J1 a J2.",
+            "Oddělit doporučený další krok od ověřeného faktu.",
+            "Nevymýšlet email, telefon, datum schůzky ani obchodní vztah."
+          ],
+          "evidence": [
+            "docs/handoffs/agent-b.md: owner acceptance matrix and 30 passing research tests.",
+            "apps/api/tests/research/live-evidence/README.md and broad-search-report.json: three actual provider runs, reviewed sources and latencies; initial-report.json preserves namesake/retrieval failures.",
+            "draft-validation.json validates reviewed profile and selection drafts; D integrated prepareResearchDraft into API.",
+            "tests/e2e/evidence/live-research-api.json: additional live API handler probe, profile ambiguous with no accepted claims and selection with one sourced claim. Browser/workspace gates are separate."
+          ],
+          "blocker": null
+        },
+        {
+          "id": "B06",
+          "done": true,
+          "depends_on": [
+            "B05"
+          ],
+          "title": "Live důkaz a předání",
+          "acceptance": [
+            "Při dostupných klíčích doložit alespoň tři skutečné research běhy včetně selection.",
+            "Vyhodnotit jmenovce, prázdné výsledky, rate limit a timeout.",
+            "Předat redigované evidence a měřenou latenci; žádné tvrzení o kvalitě pouze z mocku."
+          ],
+          "evidence": [
+            "docs/handoffs/agent-b.md: owner acceptance matrix and 30 passing research tests.",
+            "apps/api/tests/research/live-evidence/README.md and broad-search-report.json: three actual provider runs, reviewed sources and latencies; initial-report.json preserves namesake/retrieval failures.",
+            "draft-validation.json validates reviewed profile and selection drafts; D integrated prepareResearchDraft into API.",
+            "tests/e2e/evidence/live-research-api.json: additional live API handler probe, profile ambiguous with no accepted claims and selection with one sourced claim. Browser/workspace gates are separate."
+          ],
+          "blocker": null
+        },
+        {
+          "owner": "B",
+          "id": "SB01",
+          "title": "Anglický popis a titul",
+          "depends_on": [],
+          "acceptance": [
+            "Připravit title AgentLayer, cílového uživatele, problém, přínos kontextu a skutečný rozsah.",
+            "Krátká a plná verze podle limitů formuláře.",
+            "Každé finální tvrzení propojit s důkazem, zamýšlené funkce nevydávat za hotové."
+          ],
+          "artifact": "docs/submission/DRAFT.md",
+          "done": false,
+          "evidence": [],
+          "blocker": null
+        },
+        {
+          "owner": "B",
+          "id": "SB02",
+          "title": "Sponsor strategie a pravdivá atribuce",
+          "depends_on": [],
+          "acceptance": [
+            "Priorita je hlavní soutěž a Best Use of Ambiguous s konkrétním workspace přínosem.",
+            "Odlišit oznámené ceny od neověřených podmínek způsobilosti.",
+            "CopilotKit pouze po užitečné skutečné integraci; logo ani tag nejsou důkaz použití.",
+            "Tagování partnerů neznamená, že jsme všechny jejich technologie použili."
+          ],
+          "artifact": "docs/submission/SPONSOR-STRATEGY.md",
+          "done": false,
+          "evidence": [],
+          "blocker": null
+        },
+        {
+          "owner": "B",
+          "id": "SB03",
+          "title": "Uzamknout finální copy podle důkazů",
+          "depends_on": [
+            "SB01",
+            "SB02",
+            "D06"
+          ],
+          "acceptance": [
+            "Označit skutečně hotové J1/J2, model/provider a omezení.",
+            "Vyplnit claim-to-evidence mapu a odstranit nepodložené sliby.",
+            "Předat jednu finální verzi pro README, portál a social."
+          ],
+          "artifact": "docs/submission/DRAFT.md",
+          "done": false,
+          "evidence": [],
+          "blocker": null
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "name": "Ambiguous workspace actions & persistence",
+      "done": false,
+      "owns": [
+        "apps/api/src/workspace/**",
+        "apps/api/src/adapters/ambiguous.ts",
+        "apps/api/tests/workspace/**",
+        "docs/handoffs/agent-c.md"
+      ],
+      "excludes": [
+        "apps/api/src/app.ts",
+        "apps/api/src/index.ts",
+        "Research moduly",
+        "packages/contracts/**",
+        "Všechny package.json a lockfile"
+      ],
+      "start_without_other_agents": "Ověřit veřejné schéma, navrhnout mapování a state machine proti fixtures. Není nutné čekat na výzkumného agenta ani hotové UI.",
+      "deliverable": "Ověřené vytvoření či znovupoužití kontaktu, navázaného tasku a poznámky se zvládnutým retry/partial.",
+      "tasks": [
+        {
+          "id": "C01",
+          "done": false,
+          "depends_on": [],
+          "title": "Specifikace a capability matrix Ambiguous",
+          "acceptance": [
+            "Zapsat skutečná schémata create/read/search kontaktu, tasku a note/document.",
+            "Ověřit required fields, vazbu contact_id, response envelope, limity a záznamové URL.",
+            "Poznámky/documents endpoint neodhadovat; při chybějící schopnosti předat konkrétní blocker D."
+          ],
+          "evidence": [],
+          "blocker": null
+        },
+        {
+          "id": "C02",
+          "done": false,
+          "depends_on": [
+            "C01",
+            "D01"
+          ],
+          "title": "Mapování návrhů na workspace data",
+          "acceptance": [
+            "Převádět pouze povolená zkontrolovaná pole a evidence.",
+            "Respektovat provider limity; odmítnout neplatný návrh před prvním zápisem.",
+            "Zachovat profil URL a research zdroje v podporovaném poli/obsahu."
+          ],
+          "evidence": [],
+          "blocker": "Optional-date mismatch: approved dueAt null persisted as SLA 2026-09-26; C mapping/read-back correction needed. Native browser and record-link acceptance also remain open."
+        },
+        {
+          "id": "C03",
+          "done": false,
+          "depends_on": [
+            "C02"
+          ],
+          "title": "Kontakt a deduplikace",
+          "acceptance": [
+            "Najít existující kontakt podle ověřeného stabilního identifikátoru, pokud je podporován.",
+            "Při nejasné shodě vyžádat rozhodnutí uživatele; nikdy neslučovat jen podle jména.",
+            "Vytvořit nebo znovu použít kontakt bez přepisování existujících autoritativních polí."
+          ],
+          "evidence": [],
+          "blocker": null
+        },
+        {
+          "id": "C04",
+          "done": false,
+          "depends_on": [
+            "C03"
+          ],
+          "title": "Navázaný follow-up task",
+          "acceptance": [
+            "Vytvořit task spojený se správným contact_id.",
+            "Vrátit skutečné ID a ověřený odkaz, načíst výsledek zpět.",
+            "Kontakt vytvořený dříve nesmí vzniknout znovu při opakování task kroku."
+          ],
+          "evidence": [
+            "apps/api/tests/workspace/live-demo-result.json: approved three-record synthetic live demo, HTTP read-back, linkage and fresh-process replay with zero POST attempts. No native browser or live research-to-save claim."
+          ],
+          "blocker": "Optional-date mismatch: approved dueAt null persisted as SLA 2026-09-26; C mapping/read-back correction needed. Native browser and record-link acceptance also remain open."
+        },
+        {
+          "id": "C05",
+          "done": false,
+          "depends_on": [
+            "C02"
+          ],
+          "title": "Persistentní research note",
+          "acceptance": [
+            "Uložit skutečnou note/document v Ambiguous včetně selection a zdrojové URL.",
+            "Ověřit read-back a odkaz na obsah.",
+            "Nezaměňovat lokální paměť ani text tasku za dokončenou note integraci."
+          ],
+          "evidence": [
+            "apps/api/tests/workspace/live-demo-result.json: approved three-record synthetic live demo, HTTP read-back, linkage and fresh-process replay with zero POST attempts. No native browser or live research-to-save claim."
+          ],
+          "blocker": null
+        },
+        {
+          "id": "C06",
+          "done": false,
+          "depends_on": [
+            "C04",
+            "C05"
+          ],
+          "title": "Journal, idempotence a reconciliation",
+          "acceptance": [
+            "Ukládat requestId, hash schváleného payloadu a stav jednotlivých operací do lokálního perzistentního journalu; technologii sjednotit s D.",
+            "Stejný requestId s jiným payloadem odmítnout.",
+            "Po timeoutu nejprve ověřit vznik záznamu; pokud ho nelze zjistit, vrátit unknown a neprovést slepý retry.",
+            "Restart backendu neztratí potvrzená ID ani stav nejistého zápisu."
+          ],
+          "evidence": [
+            "apps/api/tests/workspace/live-demo-result.json: approved three-record synthetic live demo, HTTP read-back, linkage and fresh-process replay with zero POST attempts. No native browser or live research-to-save claim."
+          ],
+          "blocker": null
+        },
+        {
+          "id": "C07",
+          "done": false,
+          "depends_on": [
+            "C06",
+            "D02"
+          ],
+          "title": "Živý workspace důkaz",
+          "acceptance": [
+            "Ve výslovně určeném demo workspace provést J1 a J2 a read-back.",
+            "Doložit skutečné vazby, zachované zdroje, partial failure a retry bez duplicit.",
+            "U testovacích zápisů evidovat vytvořená ID; mazání nebo úpravy cizích záznamů nejsou součást automatického úklidu."
+          ],
+          "evidence": [
+            "apps/api/tests/workspace/live-demo-result.json: approved three-record synthetic live demo, HTTP read-back, linkage and fresh-process replay with zero POST attempts. No native browser or live research-to-save claim."
+          ],
+          "blocker": "Optional-date mismatch: approved dueAt null persisted as SLA 2026-09-26; C mapping/read-back correction needed. Native browser and record-link acceptance also remain open."
+        },
+        {
+          "owner": "C",
+          "id": "SC01",
+          "title": "Social draft a správné tagy",
+          "depends_on": [],
+          "acceptance": [
+            "Připravit krátkou a LinkedIn variantu v angličtině s odkazy, za Davida jako solo autora.",
+            "Získat cílovou platformu a účet, ověřit skutečné partner handles.",
+            "Do ověření ponechat jasné placeholdery, žádné odhadnuté tagy.",
+            "Ověřit požadovaný seznam organizátora, nejen naše technologie."
+          ],
+          "artifact": "docs/submission/SOCIAL-POST.md",
+          "done": false,
+          "evidence": [],
+          "blocker": null
+        },
+        {
+          "owner": "C",
+          "id": "SC02",
+          "title": "Publikovat finální social post",
+          "depends_on": [
+            "SC01",
+            "SB03",
+            "SD03",
+            "SD04"
+          ],
+          "acceptance": [
+            "Předložit přesný text, účet, tagy, odkazy a médium; mít konkrétní zadání publikovat tento obsah.",
+            "Zveřejnit schválenou verzi veřejně se správnými tagy.",
+            "Ověřit permalink bez přihlášení a předat ho do portálu."
+          ],
+          "artifact": "docs/submission/SOCIAL-POST.md",
+          "done": false,
+          "evidence": [],
+          "blocker": null
+        },
+        {
+          "owner": "C",
+          "id": "SC03",
+          "title": "Důkaz pro Ambiguous prize",
+          "depends_on": [
+            "C07"
+          ],
+          "acceptance": [
+            "Zachytit skutečný kontakt, navázaný task a note se zdroji a read-back.",
+            "Vysvětlit konkrétní přínos pro spolupráci člověka a agenta.",
+            "Předat skutečné záběry A a popis B; nevymýšlet počty výsledků."
+          ],
+          "artifact": "docs/submission/EVIDENCE.md",
+          "done": false,
+          "evidence": [],
+          "blocker": null
+        }
+      ]
+    },
+    {
+      "id": "D",
+      "name": "Contracts, integration, QA & delivery",
+      "done": false,
+      "owns": [
+        "packages/contracts/**",
+        "apps/api/src/app.ts",
+        "apps/api/src/index.ts",
+        "apps/api/src/config/**",
+        "apps/api/src/routes/**",
+        "apps/api/src/app.test.ts",
+        "apps/api/tsup.config.ts",
+        "apps/api/tsconfig.json",
+        "apps/api/.env.example",
+        "tests/e2e/**",
+        "Root konfigurace, všechny package.json a lockfile",
+        "README.md",
+        "AGENTS.md",
+        "docs/DELIVERY-PLAN.json",
+        "docs/AGENT-TASKS.md",
+        "docs/QA-NOTES.md",
+        "docs/handoffs/agent-d.md",
+        "docs/submission/**"
+      ],
+      "excludes": [
+        "Implementace UI, research a workspace modulů vlastněných A/B/C"
+      ],
+      "start_without_other_agents": "Založit kontraktové fixtures, vyjasnit readiness a konfiguraci, napsat testovací scénáře. Následně průběžně zapojovat hotové moduly.",
+      "deliverable": "Spojený produkt, prokazatelně funkční oba cílové průchody, opakovatelné spuštění a submission.",
+      "tasks": [
+        {
+          "id": "D01",
+          "done": true,
+          "depends_on": [],
+          "title": "Zmrazit kontrakty a pracovní hranice",
+          "acceptance": [
+            "Převést navržené modely do verzovaných Zod/TS rozhraní bez změny významu.",
+            "Přidat sdílené fixtures pro všechny vyjmenované stavy.",
+            "Potvrdit importy a modulové funkce A/B/C; jediný vlastník app.ts a root dependency instalací.",
+            "Fixtures a kontrakty předat nejdřív, aby A/B/C nemuseli čekat na server."
+          ],
+          "evidence": [
+            "packages/contracts/src/index.ts reexports canonical v1; all runtime imports use v1. Legacy schemas removed after A migration.",
+            "Eight shared fixture scenarios and six contract tests pass; calendar dueAt and created/reused/unknown semantics validated.",
+            "A handoff confirms v1 migration; C workspace/v1.ts and D config bind the shared schemas; B boundary is validated in config and routes."
+          ],
+          "blocker": null
+        },
+        {
+          "id": "D02",
+          "done": false,
+          "depends_on": [],
+          "title": "Ověřit konfiguraci a podmínky live běhu",
+          "acceptance": [
+            "Zjistit dostupnost OpenAI/Exa/Ambiguous klíčů a určeného demo workspace bez zveřejnění tajemství.",
+            "Potvrdit lokální event timing, pravidla předpřipraveného kódu a submission formát.",
+            "Rozlišit missing configuration, configured a verified; samotná existence klíče není konektivita.",
+            "Nedostupný vstup zapsat jako blocker příslušného live úkolu; ostatní práce pokračuje."
+          ],
+          "evidence": [
+            "Environment presence check: OPENAI_API_KEY present; OPENAI_MODEL, EXA_API_KEY, AMBIGUOUS_API_KEY, AMBIGUOUS_WORKSPACE_ID absent. apps/api/.env absent. No secret values emitted.",
+            "Authenticated GET /api/settings/connection differentiates missing_configuration/configured; no provider verified.",
+            "Latest presence recheck after local configuration changed: OPENAI_API_KEY and AMBIGUOUS_API_KEY present; OPENAI_MODEL, EXA_API_KEY, AMBIGUOUS_WORKSPACE_ID missing. No secret values emitted; no connectivity claim.",
+            "Event/handbook verified through browser: public GitHub, two-minute video, public sponsor-tagged post; net-new core required, starter blocks allowed. SF portal cutoff2026-09-12T16:30:00-07:00.",
+            "All five required configuration values now present; B verified live OpenAI/Exa and C verified workspace AgentLayer by authenticated reads. EVENT-REQUIREMENTS.md supplies event rules."
+          ],
+          "blocker": "Named workspace demo writes still need explicit approval; team registration/deadline and prepared-code eligibility remain unconfirmed."
+        },
+        {
+          "id": "D03",
+          "done": true,
+          "depends_on": [
+            "D01"
+          ],
+          "title": "Backend rozhraní a provozní limity",
+          "acceptance": [
+            "Autentizovat a validovat research/commit/status routes; vynutit povolené akce pro daný context kind.",
+            "Server uchová vazbu context/proposal/mode, klient ji nemůže libovolně podvrhnout.",
+            "Dohodnout s C perzistentní journal pro single-workspace demo a jeho umístění mimo git.",
+            "Chyby, zrušení a timeouty mají konzistentní kontrakt; readiness ani logy neprozrazují klíče."
+          ],
+          "evidence": [
+            "Authenticated v1 research/commit/status and settings routes; legacy /api/tasks removed.",
+            "app.test.ts proves context binding, immutable source profile, request conflict, profile/contact/task/note HTTP integration and restart status with persistent fixture journal.",
+            "routes/errors.ts centralizes ApiError; provider rate limit is 429; missing integration is 503; errors and readiness disclose no credentials.",
+            "C journal under ignored .agentlayer accepted for single-workspace local mode; fail-closed crash lock documented in README.",
+            "npm run typecheck passes; final npm test: 55 API/research/workspace and 6 contract tests pass."
+          ],
+          "blocker": null
+        },
+        {
+          "id": "D04",
+          "done": false,
+          "depends_on": [
+            "D03",
+            "A05",
+            "B05",
+            "C04"
+          ],
+          "title": "Spojit živý profilový průchod",
+          "acceptance": [
+            "Přepojit extension na research a commit bez paralelní nekompatibilní cesty.",
+            "Odstranit možnost zaměnit demo výstup za live proposal.",
+            "Ověřit J1 od skutečné stránky po skutečný kontakt i task; opravy vracet vlastníkům modulů."
+          ],
+          "evidence": [
+            "v1 extension transport and server are connected; local HTTP fixture profile and note flows pass.",
+            "tests/e2e/extension-smoke.mjs passes pairing, extraction, missing configuration, SPA invalidation and auth through built extension/local HTTP; no toolbar/live-provider claim.",
+            "apps/extension/tests/browser-tests.mjs passes five grouped synthetic browser scenarios, no page errors."
+          ],
+          "blocker": "Optional-date mismatch: approved dueAt null persisted as SLA 2026-09-26; C mapping/read-back correction needed. Native browser and record-link acceptance also remain open."
+        },
+        {
+          "id": "D05",
+          "done": false,
+          "depends_on": [
+            "D03",
+            "A06",
+            "B05",
+            "C05"
+          ],
+          "title": "Spojit druhé prostředí",
+          "acceptance": [
+            "Provést J2 na reálné obsahové stránce s odlišnou nabídkou akcí.",
+            "Poznámka se uloží a lze ji otevřít v Ambiguous.",
+            "Demo jasně ukazuje, že kontext mění chování a interface."
+          ],
+          "evidence": [
+            "v1 extension transport and server are connected; local HTTP fixture profile and note flows pass.",
+            "tests/e2e/extension-smoke.mjs passes pairing, extraction, missing configuration, SPA invalidation and auth through built extension/local HTTP; no toolbar/live-provider claim.",
+            "apps/extension/tests/browser-tests.mjs passes five grouped synthetic browser scenarios, no page errors."
+          ],
+          "blocker": "Approved synthetic document exists; actual browser selection-to-live-research-to-save and verified UI link remain open."
+        },
+        {
+          "id": "D06",
+          "done": false,
+          "depends_on": [
+            "D04",
+            "D05",
+            "C07",
+            "A08",
+            "B06"
+          ],
+          "title": "Finální browser a failure acceptance",
+          "acceptance": [
+            "Ověřit alespoň tři skutečné profily a dvě obsahové stránky; fixtures hodnotit zvlášť.",
+            "Zkontrolovat skutečný toolbar click, párování, editaci, Save, read-back, SPA přechod a opožděné odpovědi.",
+            "Ověřit 401/429, výpadek Exa, jmenovce, partial contact/task, retry a restart journalu.",
+            "Znovu spustit build/typecheck a relevantní testy na finálním spojeném stavu."
+          ],
+          "evidence": [
+            "v1 extension transport and server are connected; local HTTP fixture profile and note flows pass.",
+            "tests/e2e/extension-smoke.mjs passes pairing, extraction, missing configuration, SPA invalidation and auth through built extension/local HTTP; no toolbar/live-provider claim.",
+            "apps/extension/tests/browser-tests.mjs passes five grouped synthetic browser scenarios, no page errors."
+          ],
+          "blocker": "Optional-date mismatch: approved dueAt null persisted as SLA 2026-09-26; C mapping/read-back correction needed. Native browser and record-link acceptance also remain open."
+        },
+        {
+          "id": "D07",
+          "done": false,
+          "depends_on": [
+            "D06"
+          ],
+          "title": "Spuštění pro dalšího člověka a submission",
+          "acceptance": [
+            "Čistý browser profil a dokumentované kroky vedou k funkčnímu produktu.",
+            "Připravit anglický popis, krátké video, reálné screenshoty, seznam omezení a použitých integrací.",
+            "Pokud portál vyžaduje hosting či konkrétní formát, připravit jej podle ověřených pravidel, nikoli předpokladu.",
+            "Odevzdání/publikaci provést pouze v rámci následného výslovného zadání; důkaz submission vyžadovat, pokud je součástí požadované dodávky."
+          ],
+          "evidence": [
+            "README.md documents current setup, configuration, recovery and evidence limits.",
+            "docs/submission/DRAFT.md contains English description, unrecorded demonstration sequence and gate evidence matrix; nothing submitted."
+          ],
+          "blocker": "Finální live evidence a clean-profile journey musí projít akceptací; detaily publikace sledují SD01–SD06."
+        },
+        {
+          "id": "D08",
+          "done": false,
+          "depends_on": [
+            "D07",
+            "SD06"
+          ],
+          "title": "Uzavřít plán proti cílovému výsledku",
+          "acceptance": [
+            "Pro každou hotovou položku evidovat důkaz a odstraněné blockery.",
+            "Splnit všechny povinné gates; zbylé body zůstávají otevřené.",
+            "Task-only ani funkční mock nejsou důvodem označit desired_end_result.done true."
+          ],
+          "evidence": [
+            "Current gate audit: G1-G5 all remain false; only D01/D03 accepted. Local tests do not establish desired_end_result completion."
+          ],
+          "blocker": "Full J1/J2 and final gates require missing live configuration, workspace scope and external/browser evidence."
+        },
+        {
+          "owner": "D",
+          "id": "SD01",
+          "title": "Potvrdit portál, tým a pravidla",
+          "depends_on": [],
+          "acceptance": [
+            "Zapsat event/portal URL, city/virtual registraci, Davida Krále jako jediného člena a submittera.",
+            "Potvrdit týmový deadline/timezone, prepared-code eligibility, video hosting a sponsor handles.",
+            "Public GitHub, dvouminutové video a veřejný social jsou již potvrzené; ověřit formulářové detaily.",
+            "Přístup do týmové submission ověřit před koncem build okna."
+          ],
+          "artifact": "docs/submission/RELEASE-CHECKLIST.md",
+          "done": false,
+          "evidence": [
+            "David Král confirmed solo participation. Browser verified event, portal and handbook: cutoff16:30PDT, five mandatory artifacts, new core built during event; templates permitted."
+          ],
+          "blocker": "Přijetí a přístup k týmovému formuláři, social účet/handles a video hosting zatím chybí."
+        },
+        {
+          "owner": "D",
+          "id": "SD02",
+          "title": "Připravit veřejně sdílitelný repozitář",
+          "depends_on": [],
+          "acceptance": [
+            "Prověřit remote, branch a změny bez ztráty práce ostatních.",
+            "Zkontrolovat publikovaný obsah i historii na tajemství a soukromá data; neemitovat jejich hodnoty.",
+            "Doplnit README setup/config/architekturu/limity/licence a původ starteru.",
+            "Ověřit čistý checkout a reprodukci finálního stavu."
+          ],
+          "artifact": "docs/submission/RELEASE-CHECKLIST.md",
+          "done": false,
+          "evidence": [
+            "tests/e2e/release-audit.mjs: 131 candidate files and two reachable commit histories scanned for exact configured credential values; zero matches; env ignored/untracked.",
+            "README.md source attribution and live/fixture status updated; RELEASE-CHECKLIST.md records main and current HEAD."
+          ],
+          "blocker": "Final commit, broad private-data review and clean-checkout reproduction remain pending; no publication performed."
+        },
+        {
+          "owner": "D",
+          "id": "SD03",
+          "title": "Publikovat finální commit a ověřit public repo",
+          "depends_on": [
+            "SD02",
+            "D06"
+          ],
+          "acceptance": [
+            "Připravit repo, branch, commit a seznam souborů, ověřit autorizovaný rozsah push.",
+            "Pushnout konkrétní schválený obsah; případnou změnu visibility provést jen na zadání.",
+            "Otevřít repo/README/kód anonymně a zapsat commit SHA. Veřejnost staršího commitu nestačí k dokončení."
+          ],
+          "artifact": "docs/submission/RELEASE-CHECKLIST.md",
+          "done": false,
+          "evidence": [
+            "Public GitHub page verified in anonymous Playwright browser on2026-09-12; current remote has2commits and older scaffold README. Final local changes are not yet accepted/published."
+          ],
+          "blocker": null
+        },
+        {
+          "owner": "D",
+          "id": "SD04",
+          "title": "Nahrát video a ověřit přehrání",
+          "depends_on": [
+            "SA02",
+            "SD01"
+          ],
+          "acceptance": [
+            "Vybrat hostitele podle portálu a nahrát finální video v autorizovaném rozsahu.",
+            "Ověřit veřejné přehrání bez našeho přihlášení, délku a čitelnost.",
+            "Zapsat přesnou video URL; lokální soubor není submission odkaz."
+          ],
+          "artifact": "docs/submission/RELEASE-CHECKLIST.md",
+          "done": false,
+          "evidence": [],
+          "blocker": null
+        },
+        {
+          "owner": "D",
+          "id": "SD05",
+          "title": "Vyplnit a odevzdat submission",
+          "depends_on": [
+            "SD01",
+            "SD03",
+            "SD04",
+            "SC02",
+            "SB03"
+          ],
+          "acceptance": [
+            "Vyplnit title, popis, veřejné repo, video, social URL a skutečná týmová pole.",
+            "Zkontrolovat preview i odkazy; sponsor nominaci vybrat podle pravidel a skutečných integrací.",
+            "V konkrétně zadaném rozsahu odeslat včas; uložit confirmation, ID a čas.",
+            "Znovu otevřít odevzdaný projekt; uložený draft není submitted."
+          ],
+          "artifact": "docs/submission/RELEASE-CHECKLIST.md",
+          "done": false,
+          "evidence": [],
+          "blocker": null
+        },
+        {
+          "owner": "D",
+          "id": "SD06",
+          "title": "Závěrečný audit soutěžní dodávky",
+          "depends_on": [
+            "SD05"
+          ],
+          "acceptance": [
+            "Záznam obsahuje finální SHA, popis, dvouminutové video, public social a potvrzení portálu.",
+            "Oddělit product-complete a competition-submitted; neoznačit nehotový produkt za hotový kvůli submission.",
+            "Lokální show-and-tell není formální judging ani náhrada submission."
+          ],
+          "artifact": "docs/submission/RELEASE-CHECKLIST.md",
+          "done": false,
+          "evidence": [],
+          "blocker": null
+        }
+      ]
+    }
+  ],
+  "coordination": {
+    "done": false,
+    "concurrency": "Čtyři aktivní role A/B/C/D. V prostředí s limitem čtyř slotů plní hlavní agent roli D a spouští A/B/C; není potřeba pátý koordinátor.",
+    "independent_work": "A vyvíjí DOM/UI s fixtures, B research modul s evidence fixtures, C workspace klient/state machine s provider fixtures, D contracts/API/test harness. Live end-to-end má skutečné závislosti uvedené v depends_on.",
+    "change_rule": "Nikdo není v checkoutu sám. Neupravovat ani nevracet cizí změny. Změnu kontraktu či dependency poslat D; ten provede jednu synchronizovanou změnu.",
+    "merge_rule": "D integruje po jednotlivých modulech; shared working tree nevyžaduje vzájemné cherry-picky. Při oddělených worktrees zachovat stejné vlastnictví a testovat až skutečný spojený stav.",
+    "handoff_format": [
+      "task_ids",
+      "changed_files",
+      "public_interface",
+      "checks_and_results",
+      "evidence_paths",
+      "live_or_fixture",
+      "blockers",
+      "next_dependency"
+    ],
+    "operational_rule": "Spuštěné serverové procesy, instalace a společné testovací prostředí spravuje D. A/B/C nespouštějí soupeřící servery na stejném portu.",
+    "submission_ownership": {
+      "A": "VIDEO-PLAN.md a video export",
+      "B": "DRAFT.md a SPONSOR-STRATEGY.md",
+      "C": "SOCIAL-POST.md a podklady pro Ambiguous evidence",
+      "D": "RELEASE-CHECKLIST.md, EVENT-REQUIREMENTS.md, EVIDENCE.md, repo a portál"
+    },
+    "submission_ownership_rule": "Přesné submission vlastnictví má přednost před starším obecným docs/submission/**. D integruje evidence podklady C."
+  },
+  "final_gates": [
+    {
+      "id": "G1",
+      "done": false,
+      "title": "Skutečné prostředí",
+      "requires": [
+        "A08",
+        "D06"
+      ],
+      "proof": "Toolbar a inline UI fungují na reálném profilu a jiné stránce, bez úpravy aplikací."
+    },
+    {
+      "id": "G2",
+      "done": true,
+      "title": "Skutečný agent a evidence",
+      "requires": [
+        "B06"
+      ],
+      "proof": "Live Exa + modelový běh, relevantní zdroje a označená nejistota."
+    },
+    {
+      "id": "G3",
+      "done": false,
+      "title": "Skutečná práce v workspace",
+      "requires": [
+        "C07",
+        "D04",
+        "D05"
+      ],
+      "proof": "Existující/vytvořený CRM kontakt, navázaný task a note, ověřeno read-back."
+    },
+    {
+      "id": "G4",
+      "done": false,
+      "title": "Kontrola a spolehlivost",
+      "requires": [
+        "A06",
+        "C06",
+        "D06"
+      ],
+      "proof": "Žádné zápisy bez Save, žádné tiché duplicity, pravdivý partial/unknown a izolace kontextu."
+    },
+    {
+      "id": "G5",
+      "done": false,
+      "title": "Předání",
+      "requires": [
+        "D07"
+      ],
+      "proof": "Jiný člověk spustí řešení podle README; materiály ukazují skutečně hotové funkce."
+    },
+    {
+      "id": "G6",
+      "done": false,
+      "title": "Kompletní soutěžní submission",
+      "requires": [
+        "SD06"
+      ],
+      "proof": "Veřejný finální commit, popis, přehratelné dvouminutové video, social s tagy a potvrzení portálu."
+    }
+  ],
+  "later_backlog": [
+    {
+      "id": "L1",
+      "done": false,
+      "title": "GitHub issue/repository adapter",
+      "scope": "Kontext issue → evidence research → návrh řešení/work item. Není součástí J1/J2 akceptace."
+    },
+    {
+      "id": "L2",
+      "done": false,
+      "title": "Více webových adaptérů",
+      "scope": "Rozšiřovat podle ověřených DOM kontraktů a měřitelného přínosu."
+    },
+    {
+      "id": "L3",
+      "done": false,
+      "title": "Přihlášení sidebaru přes Auth0 a více uživatelů/workspace",
+      "scope": "Odložený backlog: přihlášení a odhlášení přes Auth0, zobrazení stavu uživatele v sidebaru, ověření přístupu na API a vazba uživatele na workspace. Zahrnout izolaci uživatelských dat a lifecycle přístupů. A řeší sidebar a přihlašovací tok; D konfiguraci Auth0, backendové ověření a workspace oprávnění.",
+      "execution_rule": "Uživatel výslovně odložil implementaci. Nyní pouze evidence v backlogu; zahájit až po novém zadání. Do té doby zůstává současné párování tokenem."
+    },
+    {
+      "id": "L4",
+      "done": false,
+      "title": "Ori evaluace a OpenRouter routing",
+      "scope": "Volitelné až po hotovém hlavním toku; žádná povinná druhá runtime větev."
+    },
+    {
+      "id": "L5",
+      "done": false,
+      "title": "Publikace extension a hosting",
+      "scope": "Podle požadovaného způsobu distribuce a skutečných pravidel soutěže."
+    }
+  ],
+  "agent_launch_prompts": {
+    "A": "Jsi agent A. Přečti docs/DELIVERY-PLAN.json a své A01–A08. Vlastníš pouze uvedené extension cesty; nejsi v checkoutu sám, nevracej cizí změny. Pracuj proti D kontraktům, začni fixtures a DOM/UI nezávisle na klíčích. Povinný výsledek je skutečný profil i selection, review/save a správné stavy. Do docs/handoffs/agent-a.md zapisuj důkazy a blockery. Nestav znovu celou aplikaci a neoznačuj mock jako live. Souběžně SA01–SA02: scénář a video.",
+    "B": "Jsi agent B. Přečti docs/DELIVERY-PLAN.json a B01–B06. Vlastníš pouze research/Exa cesty, nikoli app.ts či workspace writes. Nejsi v checkoutu sám; dependency požadavky pošli D. Implementuj jediný bounded agent s Exa a citacemi proti společnému kontraktu. Bez klíčů pokračuj evidence fixtures a validací, live akceptaci nech otevřenou. Předávej konkrétní důkazy do docs/handoffs/agent-b.md. Souběžně SB01–SB03: texty a sponsor strategie.",
+    "C": "Jsi agent C. Přečti docs/DELIVERY-PLAN.json a C01–C07. Vlastníš workspace/Ambiguous cesty; nikoli app.ts nebo výzkum. Nejsi v checkoutu sám. Začni reálným API schématem a fixtures, pak reviewed contact+task a note s perzistentním stavem operací. Neodhaduj endpointy, neslučuj kontakty podle jména a neopakuj nejistý zápis slepě. Live zápisy jen v následně určeném demo workspace a zadaném integračním rozsahu. Evidence do docs/handoffs/agent-c.md. Souběžně SC01–SC03: social a Ambiguous důkazy.",
+    "D": "Jsi agent D a koordinátor. Přečti celý docs/DELIVERY-PLAN.json. Vlastníš kontrakty, HTTP zapojení, root dependency správu a QA. Nejsi v checkoutu sám a neopravuješ cizí moduly bez domluveného předání. Nejprve D01/D02, souběžně umožni A/B/C práci na fixtures. Doplň actual integration a browser/read-back důkazy. Jen ty aktualizuješ done podle acceptance. Ukonči práci až po plném cíli, nebo pravdivě eviduj externí blocker a nedokončené úkoly. Souběžně SD01–SD06: repo, odkazy a portál; sleduj G6."
+  },
+  "event_requirements": {
+    "source": "Event page, SF portal a handbook načtené přes Playwright 2026-09-12; jméno potvrzeno uživatelem.",
+    "name": "Agents, Everywhere: Bots, Channels, & More — Global Hackathon",
+    "date": "2026-09-12",
+    "timezone": "America/Los_Angeles (SF portal); city/virtual přiřazení týmu zbývá potvrdit.",
+    "schedule": {
+      "doors": "10:00",
+      "opening": "10:30–11:00",
+      "teams": "11:00–11:15",
+      "build": "11:15–15:30",
+      "submission": "15:30–16:00",
+      "optional_show_and_tell": "16:00–16:45",
+      "wrap": "16:45–17:00"
+    },
+    "judging": "Jedna globální soutěž; lokální show-and-tell bez formálního lokálního hodnocení.",
+    "required_submission": [
+      "Title",
+      "Written description",
+      "Public GitHub repository",
+      "Two-minute demo video",
+      "Public social post tagging event sponsors"
+    ],
+    "stack_rule": "Není nutné použít všechny nástroje. Oficiální starter byl oznámen, URL zatím nebyla nalezena. WXT není vydáván za oficiální event starter.",
+    "sponsors": {
+      "global": [
+        "OpenAI",
+        "CopilotKit",
+        "OpenRouter"
+      ],
+      "infrastructure": [
+        "Exa",
+        "Trigger.dev",
+        "Auth0",
+        "Mozilla.ai",
+        "Ambiguous AI"
+      ],
+      "note": "Google Cloud Run je také v ověřeném portalovém seznamu; platformové handles a povinný seznam tagů ještě potvrdit.",
+      "portal_list": [
+        "OpenAI",
+        "CopilotKit",
+        "OpenRouter",
+        "Exa",
+        "Auth0",
+        "Ambiguous AI",
+        "Trigger.dev",
+        "Mozilla",
+        "Google Cloud Run"
+      ]
+    },
+    "prizes": {
+      "first": "$10,000 OpenAI credits/team + Mac mini/member + $1,000 Exa credits/team + Exa swag",
+      "second": "$5,000 OpenAI credits/team + Ray-Ban Meta glasses/member + $500 Exa credits/team + Exa swag",
+      "third": "$2,500 OpenAI credits/team + LOOI Robot/member + $250 Exa credits/team + Exa swag",
+      "ambiguous": "Best Use of Ambiguous AI: NVIDIA DGX Spark/team",
+      "copilotkit": "Best Use of CopilotKit: purple AirPods Max/member",
+      "eligibility": "Oznámené ceny nejsou potvrzením způsobilosti nebo nároku; ověřit sponsor nominace a podrobná pravidla."
+    },
+    "event_url": "https://sf.aitinkerers.org/p/agents-everywhere-bots-channels-more-global-hackathon",
+    "portal_url": "https://sf.aitinkerers.org/hackathons/h_XWWQL5eKfJM",
+    "handbook_url": "https://sf.aitinkerers.org/hackathons/h_XWWQL5eKfJM/handbook",
+    "deadline": {
+      "portal_display": "Sep 12 at 4:30 PM PDT",
+      "iso": "2026-09-12T16:30:00-07:00",
+      "prague": "2026-09-13T01:30:00+02:00",
+      "internal_target": "2026-09-12T16:00:00-07:00",
+      "rule": "Podle handbooku rozhoduje deadline v portálu. Starší harmonogram 15:30–16:00 je pracovní submission okno; SF cutoff byl 16:30 PDT."
+    },
+    "eligibility": "Nový projekt i hlavní funkce musí vzniknout během oficiálního hackathonu. Startery, šablony, knihovny a prompty jsou povolené. Doložit původ; starý projekt nelze pouze rozšířit a přihlásit jako nový."
+  },
+  "competition_delivery": {
+    "done": false,
+    "required_artifacts": [
+      "title",
+      "written description",
+      "public repository",
+      "two-minute video",
+      "public sponsor-tagged social post",
+      "portal confirmation"
+    ],
+    "task_ids": [
+      "SA01",
+      "SA02",
+      "SB01",
+      "SB02",
+      "SB03",
+      "SC01",
+      "SC02",
+      "SC03",
+      "SD01",
+      "SD02",
+      "SD03",
+      "SD04",
+      "SD05",
+      "SD06"
+    ],
+    "product_scope_rule": "Soutěžní submission může být poctivě částečná; nedokončené produktové gates zůstávají otevřené.",
+    "publication_rule": "Nynější krok připravuje lokální podklady. Nic nebylo publikováno; finální publikace vyžaduje konkrétní destinaci, účet a zadání.",
+    "prepared_files": [
+      "docs/submission/EVENT-REQUIREMENTS.md",
+      "docs/submission/RELEASE-CHECKLIST.md",
+      "docs/submission/DRAFT.md",
+      "docs/submission/VIDEO-PLAN.md",
+      "docs/submission/SOCIAL-POST.md",
+      "docs/submission/SPONSOR-STRATEGY.md",
+      "docs/submission/EVIDENCE.md"
+    ],
+    "preparation_note": "Lokální drafty existují. Nové soutěžní úkoly zůstávají done:false do finální akceptace; D01/D03 zachovány."
+  },
+  "team": {
+    "name": "AgentLayer",
+    "members": [
+      {
+        "name": "David Král",
+        "role": "Solo builder"
+      }
+    ],
+    "human_count": 1,
+    "development_agents": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "registration_confirmed": false,
+    "social_platform": null,
+    "social_account": null
+  }
+}

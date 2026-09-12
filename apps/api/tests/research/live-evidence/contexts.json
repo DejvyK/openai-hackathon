@@ -1,0 +1,68 @@
+[
+  {
+    "schemaVersion": "v1",
+    "contextId": "live-simon-willison",
+    "kind": "profile",
+    "url": "https://simonwillison.net/about/",
+    "pageTitle": "Simon Willison",
+    "capturedAt": "2026-09-12T19:55:26.665Z",
+    "person": {
+      "name": "Simon Willison",
+      "role": null,
+      "company": null,
+      "profileUrl": "https://simonwillison.net/about/"
+    },
+    "selection": null,
+    "extractedEvidence": [
+      {
+        "field": "name",
+        "text": "Simon Willison",
+        "sourceUrl": "https://simonwillison.net/about/",
+        "method": "user_edit"
+      }
+    ]
+  },
+  {
+    "schemaVersion": "v1",
+    "contextId": "live-andrej-karpathy",
+    "kind": "profile",
+    "url": "https://karpathy.ai/",
+    "pageTitle": "Andrej Karpathy",
+    "capturedAt": "2026-09-12T19:55:26.665Z",
+    "person": {
+      "name": "Andrej Karpathy",
+      "role": null,
+      "company": null,
+      "profileUrl": "https://karpathy.ai/"
+    },
+    "selection": null,
+    "extractedEvidence": [
+      {
+        "field": "name",
+        "text": "Andrej Karpathy",
+        "sourceUrl": "https://karpathy.ai/",
+        "method": "user_edit"
+      }
+    ]
+  },
+  {
+    "schemaVersion": "v1",
+    "contextId": "live-w3c-selection",
+    "kind": "selection",
+    "url": "https://www.w3.org/WAI/fundamentals/accessibility-intro/",
+    "pageTitle": "Introduction to Web Accessibility",
+    "capturedAt": "2026-09-12T19:55:26.665Z",
+    "person": null,
+    "selection": {
+      "text": "Web accessibility means that websites, tools, and technologies are designed and developed so that people with disabilities can use them."
+    },
+    "extractedEvidence": [
+      {
+        "field": "selection",
+        "text": "Web accessibility means that websites, tools, and technologies are designed and developed so that people with disabilities can use them.",
+        "sourceUrl": "https://www.w3.org/WAI/fundamentals/accessibility-intro/",
+        "method": "user_edit"
+      }
+    ]
+  }
+]
