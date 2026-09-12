@@ -1,0 +1,24 @@
+{
+  "name": "@agentlayer/api",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env --import tsx --watch src/index.ts",
+    "start": "node --env-file-if-exists=.env dist/index.js",
+    "build": "tsup",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsx --test src/app.test.ts"
+  },
+  "dependencies": {
+    "@agentlayer/contracts": "*",
+    "@hono/node-server": "^2.1.1",
+    "hono": "^4.13.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.20.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.0"
+  }
+}

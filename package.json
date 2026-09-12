@@ -1,0 +1,21 @@
+{
+  "name": "agentlayer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": ["apps/*", "packages/*"],
+  "engines": { "node": ">=22.18" },
+  "overrides": { "vite": "7.3.6" },
+  "scripts": {
+    "dev": "concurrently -k -n api,extension \"npm run dev:api\" \"npm run dev:extension\"",
+    "dev:api": "npm run dev -w @agentlayer/api",
+    "dev:extension": "npm run dev -w @agentlayer/extension",
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5",
+    "typescript": "~5.9.3"
+  }
+}

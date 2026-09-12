@@ -1,0 +1,13 @@
+:host { all: initial; display: block; }
+* { box-sizing: border-box; }
+.agent-card { margin: 16px 0; padding: 20px; max-width: 620px; background: #101827; color: #ecf2ff; border: 1px solid #384965; border-radius: 16px; font: 14px/1.5 Arial, sans-serif; box-shadow: 0 8px 30px #0002; }
+.agent-card header { display: flex; justify-content: space-between; align-items: center; }
+.agent-card h2 { margin: 0; font-size: 20px; }
+.agent-card label { display: block; margin-top: 12px; }
+.agent-card input, .agent-card textarea { width: 100%; margin-top: 4px; padding: 9px; color: #eef4ff; background: #1b2941; border: 1px solid #506080; border-radius: 6px; font: inherit; }
+.agent-card textarea { min-height: 80px; }
+.agent-card button { margin: 12px 8px 0 0; padding: 9px 13px; background: #99f1bf; color: #13261c; border: 0; border-radius: 7px; cursor: pointer; font: inherit; }
+.agent-card button:disabled { opacity: .5; cursor: wait; }
+.agent-card a { color: #9cd7ff; }
+.agent-card .status { color: #bcd0ef; }
+.agent-card .error { color: #ffbdbd; }

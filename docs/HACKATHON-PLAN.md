@@ -1,6 +1,6 @@
 # AgentLayer — plán hackathonu
 
-Aktualizováno: 12. 9. 2026. Podklad: koncept a pravidla soutěže vložené uživatelem do konverzace. Lokální adresář byl při kontrole prázdný; zatím existuje pouze tato dokumentace.
+Aktualizováno: 12. 9. 2026. Podklad: koncept a pravidla soutěže vložené uživatelem do konverzace. Po sepsání plánu uživatel zadal přípravu boilerplate a rozdělení práce mezi agenty. Aktuální kostru a spuštění popisuje [README](../README.md), vlastnictví modulů [AGENT-TASKS](AGENT-TASKS.md). Demo scaffold není splněné živé P0.
 
 ## 1. Časový rámec a doporučení
 
@@ -58,7 +58,7 @@ GitHub adapter, další weby, historie, více workspace, OAuth/onboarding, model
 
 **Exa:** jeden cílený research osoby a firmy; začít malým počtem výsledků. Agent může podle shody identity dotaz upravit, ale omezit počet tool calls a celkový čas. Výstupy musí zachovat URL zdrojů. Search API je veřejně dokumentované; klíč a funkční odpověď zatím nebyly ověřeny. [Dokumentace](https://exa.ai/docs/reference/search)
 
-**Ambiguous AI:** action backend. Indexovaný veřejný přehled API uvádí vytváření tasků a CRM operace. Přímé načtení stránky dokumentace během rešerše selhalo. Vytvoření kontaktu, povinná pole, vazba na task, oprávnění, limity a URL výsledku zůstávají k ověření v konkrétním workspace. Nevymýšlet endpointy. [Veřejný přehled API](https://www.ambiguous.ai/agents/api)
+**Ambiguous AI:** action backend. Následný průzkum boilerplate získal [veřejnou OpenAPI specifikaci](https://app.ambiguous.ai/api/openapi.json): `POST /api/tasks` vyžaduje title (max. 255 znaků), podporuje description a contact_id a vrací `{task}`. Specifikace obsahuje také `POST /api/crm/contacts`. Konkrétní oprávnění, vytvoření a načtení záznamu v demo workspace zatím nebyly otestovány. Podrobnosti pro dalšího agenta jsou v `apps/api/src/adapters/README.md`; žádný živý adaptér zatím není implementovaný.
 
 **Ori:** oficiální repozitář OpenRouter popisuje Ori jako harness pro coding agenty. Proto ho plán nezařazuje do produktového runtime. Případné evaly až po funkčním demu. [Oficiální popis](https://github.com/OpenRouterTeam/skills/blob/main/skills/install-ori-harness/SKILL.md)
 
@@ -115,4 +115,4 @@ Pro submission doplnit pouze skutečně dokončené funkce, použitý model/prov
 
 ## 9. Zbývající informace
 
-Velikost týmu; místní event page a přesné termíny; handbook a pravidla předem připraveného kódu; dostupné klíče/kredity; přístup k demo workspace; formát submission. Tento plán nepočítá s implementací před povoleným build oknem ani s přístupem k účtům, který nebyl potvrzen.
+Velikost týmu; místní event page a přesné termíny; handbook a pravidla předem připraveného kódu; dostupné klíče/kredity; přístup k demo workspace; formát submission. Kostra byla následně připravena na výslovnou žádost uživatele. Její způsobilost pro soutěž závisí na pravidlech předem připraveného kódu; přístup k externím účtům zatím nebyl potvrzen.

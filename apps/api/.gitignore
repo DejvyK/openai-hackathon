@@ -1,0 +1,6 @@
+.env
+.env.*
+!.env.example
+.pairing-token
+dist/
+node_modules/
